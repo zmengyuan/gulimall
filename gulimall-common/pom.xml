@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gulimall</artifactId>
+        <groupId>com.atguigu.gumimall</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atguigu.gulimall</groupId>
+    <artifactId>gulimall-common</artifactId>
+    <description>每一个微服务公共的依赖，bean</description>
+
+
+    <properties>
+        <java.version>1.8</java.version>
+        <spring-cloud.version>Greenwich.SR6</spring-cloud.version>
+        <mybatisplus.version>3.2.0</mybatisplus.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <lombok.version>1.18.4</lombok.version>
+        <httpcore.version>4.4.12</httpcore.version>
+        <joda.time.version>2.9.9</joda.time.version>
+        <commons.io.version>2.5</commons.io.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <mysql.version>8.0.17</mysql.version>
+        <hutool.version>5.4.2</hutool.version>
+    </properties>
+    <dependencies>
+        <!-- mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatisplus.version}</version>
+        </dependency>
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
