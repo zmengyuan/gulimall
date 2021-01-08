@@ -15,3 +15,5 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto  # id主键自增
+server:
+  port: 9091
