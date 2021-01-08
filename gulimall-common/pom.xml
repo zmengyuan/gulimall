@@ -27,6 +27,22 @@
         <mysql.version>8.0.17</mysql.version>
         <hutool.version>5.4.2</hutool.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- SpringCloud Alibaba 包依赖管理，引入后依赖就不需要传版本号 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.1.0.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+
     <dependencies>
         <!-- mybatis-plus -->
         <dependency>
@@ -65,6 +81,12 @@
             <artifactId>servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!--nacos-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
     </dependencies>
 
