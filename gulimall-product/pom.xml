@@ -17,13 +17,14 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>2020.0.0-M6</spring-cloud.version>
+        <gulimall-common.version>1.0-SNAPSHOT</gulimall-common.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.atguigu.gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${gulimall-common.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
