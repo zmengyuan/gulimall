@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring-cloud.version>Greenwich.SR6</spring-cloud.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
         <mybatisplus.version>3.2.0</mybatisplus.version>
         <commons.lang.version>2.6</commons.lang.version>
         <lombok.version>1.18.4</lombok.version>
@@ -103,6 +103,13 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
+
+        <!--文件上传-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

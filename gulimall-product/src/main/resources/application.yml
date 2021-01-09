@@ -8,6 +8,11 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    alicloud:
+      access-key: xxx
+      secret-key: xxxx
+      oss:
+        endpoint: xxx
   application:
     name: gulimall-product
 mybatis-plus:
@@ -19,3 +24,4 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 server:
   port: 9094
+

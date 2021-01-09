@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.atguigu.gulimall.product.entity.BrandEntity;
@@ -12,12 +13,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class GulimallProductApplicationTests {
     @Autowired
     BrandService brandService;
+
+    @Autowired
+    OSSClient ossClient;
+
+    @Test
+    void testUploadByAlicloudOss() throws FileNotFoundException {
+        String bucketName = "passjava";
+        String localFile = "C:\\Users\\Administrator\\Pictures\\coding_java.png";
+        String fileKeyName = "coding_java.png";
+        InputStream inputStream = new FileInputStream(localFile);
+        ossClient.putObject(bucketName, fileKeyName, inputStream);
+        ossClient.shutdown();
+    }
+
 
     @Test
     void contextLoads() {
