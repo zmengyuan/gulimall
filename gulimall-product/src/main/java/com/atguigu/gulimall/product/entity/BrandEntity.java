@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.atguigu.common.valid.ListValue;
 import com.atguigu.common.valid.group.AddGroup;
 import com.atguigu.common.valid.group.UpdateGroup;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -49,6 +50,7 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 显示状态[0-不显示；1-显示]
 	 */
+	@ListValue(vals = {0,1}, groups = {AddGroup.class, UpdateGroup.class})
 	private Integer showStatus;
 	/**
 	 * 检索首字母
