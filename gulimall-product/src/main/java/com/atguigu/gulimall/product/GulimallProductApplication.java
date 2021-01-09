@@ -30,6 +30,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
             2） 告诉mybatis-plus,xml在哪里
             mybatis-plus:
                 mapper-location
+* 2、逻辑删除
+ *  1）、配置全局的逻辑删除规则（省略）默认1-启动 0-删除
+ *  2）、配置逻辑删除的组件Bean（省略）3.1.1可以不配置了
+ *  3）、给Bean加上逻辑删除注解@TableLogic
  */
 @MapperScan("com.atguigu.gulimall.product.dao")
 @EnableDiscoveryClient
