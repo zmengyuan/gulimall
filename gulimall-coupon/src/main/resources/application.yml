@@ -1,19 +1,19 @@
-spring:
-  datasource:
-    username: root
-    password: 123456
-    url: jdbc:mysql://192.168.31.75:3306/gulimall_sms
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-  application:
-    name: gulimall-coupon
-mybatis-plus:
-  mapper-location: classpath:/mapper/**/*.xml
-  global-config:
-    db-config:
-      id-type: auto  # id主键自增
-server:
-  port: 9091
+#spring:
+#  datasource:
+#    username: root
+#    password: 123456
+#    url: jdbc:mysql://192.168.31.75:3306/gulimall_sms
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#  application:
+#    name: gulimall-coupon
+#mybatis-plus:
+#  mapper-location: classpath:/mapper/**/*.xml
+#  global-config:
+#    db-config:
+#      id-type: auto  # id主键自增
+#server:
+#  port: 9091
