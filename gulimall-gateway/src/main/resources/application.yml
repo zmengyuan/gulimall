@@ -1,8 +1,5 @@
 spring:
   cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
     gateway:
       routes:
         #访问http://localhost:88/?url=baidu可以成功跳转
@@ -10,11 +7,19 @@ spring:
           uri: https://www.baidu.com
           predicates:
             - Query=url,baidu
+
         - id: qq_route
           uri: https://www.qq.com
           predicates:
             - Query=url,qq
-  application:
-    name: gulimall-gateway
-server:
-  port: 88
+        # 项目正式的
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+## 前端项目默认都带上/api
+## http://localhost:88/api/captcha.jpg网关会转成  http://renren-fast:8000/api/captcha.jpg
+## 但实际访问应该是http://localhost:8080/renren-fast/captcha.jpg 所以需要加路径重写
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /renren-fast/$\{segment}
+
