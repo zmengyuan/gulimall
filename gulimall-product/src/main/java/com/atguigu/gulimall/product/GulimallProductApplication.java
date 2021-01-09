@@ -54,7 +54,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
  * @Retention(RUNTIME)
  * public @interface ListValue {
-
+4、统一的异常处理
+ * @ControllerAdvice
+ *  1）、编写异常处理类，使用@ControllerAdvice。
+ *  2）、使用@ExceptionHandler标注方法可以处理的异常。
 
  */
 @MapperScan("com.atguigu.gulimall.product.dao")
