@@ -8,6 +8,7 @@ spring:
       secret-key: xxxx
       oss:
         endpoint: xxx
+        bucket: xxx
   application:
     name: gulimall-third-party
 
