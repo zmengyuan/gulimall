@@ -50,6 +50,16 @@ public class AttrGroupController {
     }
 
     /**
+     * 删除分组和属性的关联信息
+     */
+    @RequestMapping("/attr/relation/delete")
+    public R deleteRelation(@RequestBody AttrGroupRelationVo[] vos){
+        attrService.deleteRelation(vos);
+
+        return R.ok();
+    }
+
+    /**
      * 列表
      */
     @RequestMapping("/list/{catelogId}")
@@ -95,8 +105,8 @@ public class AttrGroupController {
      * 删除
      */
     @RequestMapping("/delete")
-    public R delete(@RequestBody AttrGroupRelationVo[] vos){
-        attrService.deleteRelation(vos);
+    public R delete(@RequestBody Long[] attrGroupIds){
+        attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
 
         return R.ok();
     }
