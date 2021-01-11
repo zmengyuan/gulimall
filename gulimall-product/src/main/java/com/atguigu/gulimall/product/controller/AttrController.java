@@ -6,11 +6,7 @@ import java.util.Map;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
@@ -37,10 +33,13 @@ public class AttrController {
      * @param catelogId
      * @return
      */
-    @RequestMapping(value = "/base/list/{catelogId}")
+    //product/attr/sale/list/0?
+    ///product/attr/base/list/{catelogId}
+    @GetMapping("/{attrType}/list/{catelogId}")
     public R baseList(@RequestParam Map<String,Object> params
-            ,@PathVariable Long catelogId){
-        PageUtils page = attrService.queryBaseAttrPage(params,catelogId);
+            ,@PathVariable Long catelogId
+            ,@PathVariable(value = "attrType") String type){
+        PageUtils page = attrService.queryBaseAttrPage(params,catelogId,type);
         return R.ok().put("page", page);
     }
 
