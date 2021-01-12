@@ -13,6 +13,7 @@ spring:
           predicates:
             - Query=url,qq
         # 项目正式的
+        # 第三方
         - id: third_party_route
           uri: lb://gulimall-third-party
           predicates:
@@ -26,12 +27,20 @@ spring:
             - Path=/api/product/**
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
+        # 会员
         - id: member_route
           uri: lb://gulimall-member
           predicates:
             - Path=/api/member/**
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
+        # 优惠券
+#        - id: coupon_route
+#          uri: lb://gulimall-coupon
+#          predicates:
+#            - Path=/api/coupon/**
+#          filters:
+#            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
 
         - id: admin_route
