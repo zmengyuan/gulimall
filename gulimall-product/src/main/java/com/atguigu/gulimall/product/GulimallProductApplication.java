@@ -5,6 +5,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /*
 1、整合mybatis-plus
@@ -60,6 +61,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  *  2）、使用@ExceptionHandler标注方法可以处理的异常。
 
  */
+@EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
 @MapperScan("com.atguigu.gulimall.product.dao")
 @EnableDiscoveryClient
 @SpringBootApplication
