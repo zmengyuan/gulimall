@@ -18,7 +18,8 @@ import com.atguigu.common.utils.R;
 
 
 /**
- * 
+ * * 采购需求：1、人工 2、系统自己发出
+ *  * 采购需求完成之后自动更新库存
  *
  * @author zz
  * @email zmengyuan@126.com
@@ -31,7 +32,7 @@ public class PurchaseDetailController {
     private PurchaseDetailService purchaseDetailService;
 
     /**
-     * 列表
+     * 查询采购需求列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
@@ -57,7 +58,7 @@ public class PurchaseDetailController {
     @RequestMapping("/save")
     public R save(@RequestBody PurchaseDetailEntity purchaseDetail){
 		purchaseDetailService.save(purchaseDetail);
-
+        purchaseDetail.setStatus(0);
         return R.ok();
     }
 
