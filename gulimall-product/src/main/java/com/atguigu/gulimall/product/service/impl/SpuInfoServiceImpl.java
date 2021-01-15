@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +40,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     AttrService attrService;
 
     @Autowired
-    ProductAttrValueService attrValueService;
+    ProductAttrValueService productAttrValueService;
 
     @Autowired
     SkuInfoService skuInfoService;
@@ -113,7 +111,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
             return valueEntity;
         }).collect(Collectors.toList());
-        attrValueService.saveProductAttr(collect);
+        productAttrValueService.saveProductAttr(collect);
 
 
 
@@ -252,6 +250,25 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         /*
         查询到es中需要的数据，构造好vo，远程调用es提供的接口
          */
+        //TODO 4、查询当前sku的所有可以被用来检索的规格属性
+        List<ProductAttrValueEntity> baseAttrs = productAttrValueService.baseAttrlistforspu(spuId);
+        List<Long> attrIds = baseAttrs.stream().map(attr -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+
+        List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
+        Set<Long> idSet = new HashSet<>(searchAttrIds);
+
+
+        List<SkuEsModel.Attr> attrList = baseAttrs.stream().filter((attrValue) -> {
+            return idSet.contains(attrValue.getAttrId());
+        }).map(item -> {
+            SkuEsModel.Attr attr = new SkuEsModel.Attr();
+            BeanUtils.copyProperties(item, attr);
+            return attr;
+        }).collect(Collectors.toList());
+
+
         //1、查出当前spuId对应的sku信息,品牌名字
         List<SkuInfoEntity> skus =  skuInfoService.getSkuBySpuId(spuId);
         //封装每个信息
@@ -262,6 +279,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuEsModel.setSkuImg(sku.getSkuDefaultImg());
             //hasStock  TODO 发送远程调用 是否有库存
             // hasScore  TODO 热度评分 默认给0 自己扩展
+            skuEsModel.setHotScore(0L);
             //brandName categoryName  brandImg
             BrandEntity brand = brandService.getById(skuEsModel.getBrandId());
             skuEsModel.setBrandName(brand.getName());
@@ -269,7 +287,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             CategoryEntity category = categoryService.getById(skuEsModel.getCatalogId());
             skuEsModel.setCatalogName(category.getName());
             //attr TODO 查询所有能被检索的规格属性，应该放在外面查询一次就可以了
-
+            skuEsModel.setAttrs(attrList);
             return skuEsModel;
         }).collect(Collectors.toList());
 
