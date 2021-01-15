@@ -93,9 +93,9 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
 
             //查询当前sku总库存量 不同的仓库都有  还要减去锁定的库存
-            long count = baseMapper.getSkuStock(skuId);
+            Long count = baseMapper.getSkuStock(skuId);
             vo.setSkuId(skuId);
-            vo.setHasStock(count > 0);
+            vo.setHasStock(count == null ?false:count >0);
             return vo;
         }).collect(Collectors.toList());
         return collect;
