@@ -67,6 +67,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         Springboot，访问项目的时候，默认会找index
         WebMvcAutoConfiguration
         ResourceProperties
+    4) 项目不重启，thymeleaf更新
+        引入dev
+        ctrl+shift+F9”重新编译页面或“ctrl+F9”重新编译整个项目。
      */
 @EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
 @MapperScan("com.atguigu.gulimall.product.dao")
