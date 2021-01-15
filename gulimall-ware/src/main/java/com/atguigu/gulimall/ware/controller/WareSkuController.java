@@ -32,12 +32,12 @@ public class WareSkuController {
     查询sku是否有库存
      */
     @PostMapping(value = "/hasstock")
-    public R<List<SkuHasStockVo>> getSkusHasStock(@RequestBody List<Long> skuIds) {
+    public R getSkusHasStock(@RequestBody List<Long> skuIds) {
         //sku_id stock
         List<SkuHasStockVo> vos = wareSkuService.getSkusHasStock(skuIds);
-        R<List<SkuHasStockVo>> ok = R.ok();
-        ok.setData(vos);
-        return ok;
+//        R<List<SkuHasStockVo>> ok = R.ok();
+//        ok.setData(vos);//这里的data返回null 是因为R是一个HashMap
+        return R.ok().setData(vos);
     }
     
 
