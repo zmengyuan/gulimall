@@ -1,13 +1,16 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.to.SkuHasStockVo;
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundTo;
 import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.*;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +62,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     CategoryService categoryService;
+
+    @Autowired
+    WareFeignService wareFeignService;
 
 
     @Override
@@ -269,15 +275,40 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
 
 
+
+
         //1、查出当前spuId对应的sku信息,品牌名字
         List<SkuInfoEntity> skus =  skuInfoService.getSkuBySpuId(spuId);
+
+        List<Long> skuIdList = skus.stream().map(sku -> {
+            return sku.getSkuId();
+        }).collect(Collectors.toList());
+//        TODO 发送远程调用 是否有库存
+        Map<Long, Boolean> stockMap = null;
+        try{
+            R<List<SkuHasStockVo>> skusHasStock = wareFeignService.getSkusHasStock(skuIdList);
+            stockMap = skusHasStock.getData().stream()
+                    .collect(Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
+        }catch (Exception e){
+            log.error("库存服务查询异常,原因{}",e);
+        }
+
+        Map<Long, Boolean> finalStockMap = stockMap;
         //封装每个信息
         List<SkuEsModel> upProducts = skus.stream().map((sku) -> {
             SkuEsModel skuEsModel = new SkuEsModel();
             BeanUtils.copyProperties(sku,skuEsModel);
             skuEsModel.setSkuPrice(sku.getPrice());
             skuEsModel.setSkuImg(sku.getSkuDefaultImg());
-            //hasStock  TODO 发送远程调用 是否有库存
+            //hasStock  设置库存信息
+            if (null == finalStockMap) {
+                skuEsModel.setHasStock(true);
+            }else {
+                skuEsModel.setHasStock(finalStockMap.get(sku.getSkuId()));
+            }
+
+
+
             // hasScore  TODO 热度评分 默认给0 自己扩展
             skuEsModel.setHotScore(0L);
             //brandName categoryName  brandImg
