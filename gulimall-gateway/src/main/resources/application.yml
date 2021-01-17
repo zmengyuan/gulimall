@@ -58,4 +58,11 @@ spring:
 ## 但实际访问应该是http://localhost:8080/renren-fast/captcha.jpg 所以需要加路径重写
           filters:
             - RewritePath=/api/(?<segment>/?.*), /renren-fast/$\{segment}
+        # 总体路由
+        - id: gulimall_host_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimall.com,gulimall.com
+
+
 
