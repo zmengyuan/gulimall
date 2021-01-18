@@ -152,20 +152,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         String uuid = UUID.randomUUID().toString();
         Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30,TimeUnit.SECONDS);
         if (lock) {
-            //加锁成功  执行业务
-            Map<String, List<Catalog2Vo>> dataFromDb = getDataFromDb();
-            //获取对比值+对比成功删除=原子操作
-            String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n" +
-                    "    return redis.call(\"del\",KEYS[1])\n" +
-                    "else\n" +
-                    "    return 0\n" +
-                    "end";
-            //执行脚本 删除锁  因为是脚本，所以肯定是原子执行
-            Integer lock1 = stringRedisTemplate.execute(new DefaultRedisScript<Integer>(script, Integer.class), Arrays.asList("lock"), uuid);
+            log.info("获取分布式锁成功");
+            Map<String, List<Catalog2Vo>> dataFromDb;
+            try{
+                //加锁成功  执行业务
+                dataFromDb  = getDataFromDb();
+            }finally {
+                //获取对比值+对比成功删除=原子操作
+                String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n" +
+                        "    return redis.call(\"del\",KEYS[1])\n" +
+                        "else\n" +
+                        "    return 0\n" +
+                        "end";
+                //执行脚本 删除锁  因为是脚本，所以肯定是原子执行
+                Integer lock1 = stringRedisTemplate.execute(new DefaultRedisScript<Integer>(script, Integer.class), Arrays.asList("lock"), uuid);
+            }
             return dataFromDb;
         }else {
             //加锁失败  重试
             //休眠100mx
+            log.info("获取分布式锁失败。。。。等待重试");
             try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
             return getCatelogJsonFromDbWithLocalLock();//自旋的方式
         }
