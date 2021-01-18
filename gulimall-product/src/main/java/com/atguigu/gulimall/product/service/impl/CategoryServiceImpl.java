@@ -150,7 +150,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithRedisLock() {
 //        占用分布式锁，去redis占坑
         String uuid = UUID.randomUUID().toString();
-        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30,TimeUnit.SECONDS);
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,300,TimeUnit.SECONDS);
         if (lock) {
             log.info("获取分布式锁成功");
             Map<String, List<Catalog2Vo>> dataFromDb;
