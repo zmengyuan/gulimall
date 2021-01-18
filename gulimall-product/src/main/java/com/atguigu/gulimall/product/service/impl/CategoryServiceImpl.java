@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catalog2Vo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-
+@Slf4j
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
@@ -134,13 +135,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //1、加入缓存逻辑
         String catalogJson = stringRedisTemplate.opsForValue().get("catalogJSON");
         if (StringUtils.isEmpty(catalogJson)) {
+            log.info("缓存不命中，查询数据库");
             //2、缓存中没有，查询数据库
             Map<String, List<Catalog2Vo>> catelogJsonFromDb = getCatelogJsonFromDb();
             //3、查到的数据放入缓存，将对象转换为Json字符串
             stringRedisTemplate.opsForValue().set("catalogJSON", JSON.toJSONString(catelogJsonFromDb),1, TimeUnit.DAYS);
             return catelogJsonFromDb;
         }
-
+        log.info("缓存命中，直接返回");
         //转为我们指定的对象。
         Map<String,List<Catalog2Vo>> result = JSON.parseObject(catalogJson,new TypeReference<Map<String,List<Catalog2Vo>>>(){});
         return result;
@@ -152,6 +154,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
          * 1、synchronized(this)，SpringBoot得所有组件在容器中是单例的，所以可以。
          * 2、直接方法加
          */
+
+        //TODO 本地锁，在分布式情况下想要锁住所有，要使用分布式锁
         synchronized (this){
             //得到锁之后，应该再去缓存中确定一次
             String catalogJson = stringRedisTemplate.opsForValue().get("catalogJSON");
@@ -160,7 +164,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 Map<String,List<Catalog2Vo>> result = JSON.parseObject(catalogJson,new TypeReference<Map<String,List<Catalog2Vo>>>(){});
                 return result;
             }
-
+            log.info("真的查询了数据库");
             /*
             1、将数据库的所有分类一次性查询
              */
