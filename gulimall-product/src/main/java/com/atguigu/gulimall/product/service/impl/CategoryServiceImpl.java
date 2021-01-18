@@ -138,8 +138,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             log.info("缓存不命中，查询数据库");
             //2、缓存中没有，查询数据库
             Map<String, List<Catalog2Vo>> catelogJsonFromDb = getCatelogJsonFromDb();
-            //3、查到的数据放入缓存，将对象转换为Json字符串
-            stringRedisTemplate.opsForValue().set("catalogJSON", JSON.toJSONString(catelogJsonFromDb),1, TimeUnit.DAYS);
+
             return catelogJsonFromDb;
         }
         log.info("缓存命中，直接返回");
@@ -201,7 +200,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 return catalog2Vos;
             }));
 
-
+            //3、查到的数据放入缓存，将对象转换为Json字符串
+            stringRedisTemplate.opsForValue().set("catalogJSON", JSON.toJSONString(parent_cid),1, TimeUnit.DAYS);
             return parent_cid;
         }
     }
