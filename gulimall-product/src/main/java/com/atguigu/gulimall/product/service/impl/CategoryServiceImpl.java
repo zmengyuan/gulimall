@@ -147,18 +147,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return result;
     }
     public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithRedisLock() {
-        /*
-        占用分布式锁，去redis占坑
-         */
-        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111",30,TimeUnit.SECONDS);
+//        占用分布式锁，去redis占坑
+        String uuid = UUID.randomUUID().toString();
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30,TimeUnit.SECONDS);
         if (lock) {
             //加锁成功  执行业务
             Map<String, List<Catalog2Vo>> dataFromDb = getDataFromDb();
-            stringRedisTemplate.delete("lock");//删除锁
+            String lockValue = stringRedisTemplate.opsForValue().get("lock");
+            if (uuid.equals(lockValue)) {
+//                删除自己的锁
+                stringRedisTemplate.delete("lock");
+            }
             return dataFromDb;
         }else {
             //加锁失败  重试
             //休眠100mx
+            try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
             return getCatelogJsonFromDbWithLocalLock();//自旋的方式
         }
     }
