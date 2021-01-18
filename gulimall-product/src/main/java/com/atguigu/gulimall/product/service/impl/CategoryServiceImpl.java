@@ -165,7 +165,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                         "    return 0\n" +
                         "end";
                 //执行脚本 删除锁  因为是脚本，所以肯定是原子执行
-                Integer lock1 = stringRedisTemplate.execute(new DefaultRedisScript<Integer>(script, Integer.class), Arrays.asList("lock"), uuid);
+                Long lock1 = stringRedisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class), Arrays.asList("lock"), uuid);
             }
             return dataFromDb;
         }else {
