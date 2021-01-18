@@ -1,8 +1,11 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +22,7 @@ import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 
 @Service("categoryService")
@@ -26,6 +30,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
 
     @Override
@@ -117,6 +124,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public Map<String, List<Catalog2Vo>> getCatelogJson() {
+        //1、加入缓存逻辑
+        String catalogJson = stringRedisTemplate.opsForValue().get("catalogJSON");
+        if (StringUtils.isEmpty(catalogJson)) {
+            //2、缓存中没有，查询数据库
+            Map<String, List<Catalog2Vo>> catelogJsonFromDb = getCatelogJsonFromDb();
+            //3、查到的数据放入缓存，将对象转换为Json字符串
+            stringRedisTemplate.opsForValue().set("catalogJSON", JSON.toJSONString(catelogJsonFromDb));
+            return catelogJsonFromDb;
+        }
+
+        //转为我们指定的对象。
+        Map<String,List<Catalog2Vo>> result = JSON.parseObject(catalogJson,new TypeReference<Map<String,List<Catalog2Vo>>>(){});
+        return result;
+    }
+    //一次性查询全部；从数据查询并封装分类数据
+    public Map<String, List<Catalog2Vo>> getCatelogJsonFromDb() {
         /*
         1、将数据库的所有分类一次性查询
          */
