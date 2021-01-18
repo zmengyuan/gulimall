@@ -7,6 +7,7 @@ import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -153,11 +154,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if (lock) {
             //加锁成功  执行业务
             Map<String, List<Catalog2Vo>> dataFromDb = getDataFromDb();
-            String lockValue = stringRedisTemplate.opsForValue().get("lock");
-            if (uuid.equals(lockValue)) {
-//                删除自己的锁
-                stringRedisTemplate.delete("lock");
-            }
+            //获取对比值+对比成功删除=原子操作
+            String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n" +
+                    "    return redis.call(\"del\",KEYS[1])\n" +
+                    "else\n" +
+                    "    return 0\n" +
+                    "end";
+            //执行脚本 删除锁  因为是脚本，所以肯定是原子执行
+            Integer lock1 = stringRedisTemplate.execute(new DefaultRedisScript<Integer>(script, Integer.class), Arrays.asList("lock"), uuid);
             return dataFromDb;
         }else {
             //加锁失败  重试
