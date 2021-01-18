@@ -153,6 +153,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111");
         if (lock) {
             //加锁成功  执行业务
+            //设置过期时间
+            stringRedisTemplate.expire("lock",30,TimeUnit.SECONDS);
             Map<String, List<Catalog2Vo>> dataFromDb = getDataFromDb();
             stringRedisTemplate.delete("lock");//删除锁
             return dataFromDb;
