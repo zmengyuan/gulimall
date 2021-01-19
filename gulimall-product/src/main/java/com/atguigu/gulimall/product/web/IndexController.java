@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Controller
 public class IndexController {
@@ -47,7 +49,12 @@ public class IndexController {
         RLock lock = redisson.getLock("my-lock");
         //2.加锁和解锁
         try {
-            lock.lock();
+            /*
+            如果我们传递了锁的超时时间，就发送给redis执行脚本，进行占锁，默认超时就是我们指定的时间
+            如果我们未指定超时时间，就使用看门狗的超时时间30*1000.并且执行scheduleExpirationRenewal 定时方法 设置超时时间。只要占锁成功，就会启动一个定时任务【重新给锁设置看门狗过期时间】
+            1/3的看门狗时间，重新续期
+             */
+            lock.lock(10, TimeUnit.SECONDS);
             log.info("加锁成功，执行业务方法..."+Thread.currentThread().getId());
             Thread.sleep(30000);
         } catch (Exception e){
