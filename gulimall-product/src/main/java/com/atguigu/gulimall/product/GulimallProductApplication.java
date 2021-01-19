@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -80,7 +81,28 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
    1）引入依赖pom
    2) 配置类 MyRedisConfig
 
+8、整合SpringCache
+    1)引入依赖
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+     2）如果要用redis使用缓存，引入redis  spring-boot-starter-data-redis
+     3) 写配置
+            （1）自动配置了哪些
+            CacheAutoConfiguration 会通过CacheConfigurationImportSelector 导入 RedisCacheConfiguration
+            自动配好了RedisCacheManager
+            （2）、配置使用redis作为缓存spring.cache.type=redis
+            （3）测试使用缓存
+                @Cacheable：触发将数据保存到缓存中。//代表当前方法的结果需要缓存，如果缓存中有，方法不用调用，如果缓存中没有就调用，最后将方法的结果放入到缓存中。
+                @CacheEvict：触发将数据从缓存删除。
+                @CachePut：更新缓存，而不会干扰方法的执行。
+                @Caching：组合以上多个操作
+                @CacheConfig：在类级别共享一些与缓存相关的常见设置。
+                1）开启缓存功能@EnableCaching
+                2）只需要使用注解就能完成缓存操作
      */
+@EnableCaching
 @EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
 @MapperScan("com.atguigu.gulimall.product.dao")
 @EnableDiscoveryClient
