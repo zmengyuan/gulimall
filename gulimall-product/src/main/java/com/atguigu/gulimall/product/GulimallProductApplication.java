@@ -73,8 +73,12 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 6、整合redis
     1) 引入data-redis-starter
-    2) 简单配置redis的host等信息
+    2) 简单配置redis的host等信息 application.yml
     3）使用SpringBoot自动配置好的StringRedisTemplate来操作redis
+
+   7、整合redisson
+   1）引入依赖pom
+   2) 配置类 MyRedisConfig
 
      */
 @EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
