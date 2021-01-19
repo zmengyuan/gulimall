@@ -136,18 +136,24 @@ public class IndexController {
     /**
      * 车库停车
      * 3车位
-     *
+     *  信号量可以用tryAcquire做限流
      */
     @RequestMapping(value = "/park")
     @ResponseBody
     public String park() {
         RSemaphore park = redisson.getSemaphore("park");
         park.trySetPermits(3);
-        try {
-            park.acquire();//获取一个信号，获取一个值
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        boolean  b = park.tryAcquire();
+        if (b) {
+            //执行业务
+        }else {
+            return "error";
         }
+//        try {
+//            park.acquire();//获取一个信号，获取一个值
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         return "ok";
     }
 
