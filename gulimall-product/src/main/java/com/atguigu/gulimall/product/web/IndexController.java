@@ -4,10 +4,7 @@ import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RCountDownLatch;
-import org.redisson.api.RLock;
-import org.redisson.api.RReadWriteLock;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -135,4 +132,32 @@ public class IndexController {
         door.countDown();
         return id+"班的人走了";
     }
+
+    /**
+     * 车库停车
+     * 3车位
+     *
+     */
+    @RequestMapping(value = "/park")
+    @ResponseBody
+    public String park() {
+        RSemaphore park = redisson.getSemaphore("park");
+        park.trySetPermits(3);
+        try {
+            park.acquire();//获取一个信号，获取一个值
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "ok";
+    }
+
+    @RequestMapping(value = "/go")
+    @ResponseBody
+    public String go() {
+        RSemaphore park = redisson.getSemaphore("park");
+        park.release();//释放一个车位
+
+        return "ok go";
+    }
+
 }
