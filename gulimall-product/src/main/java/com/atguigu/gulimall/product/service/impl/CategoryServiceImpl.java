@@ -5,6 +5,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catalog2Vo;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -36,6 +38,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    RedissonClient redissonClient;
 
 
     @Override
@@ -138,7 +143,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if (StringUtils.isEmpty(catalogJson)) {
             log.info("缓存不命中，查询数据库");
             //2、缓存中没有，查询数据库
-            Map<String, List<Catalog2Vo>> catelogJsonFromDb = getCatelogJsonFromDbWithRedisLock();
+            Map<String, List<Catalog2Vo>> catelogJsonFromDb = getCatelogJsonFromDbWithRedissonLock();
 
             return catelogJsonFromDb;
         }
@@ -147,6 +152,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Map<String,List<Catalog2Vo>> result = JSON.parseObject(catalogJson,new TypeReference<Map<String,List<Catalog2Vo>>>(){});
         return result;
     }
+
+    /**
+     * 缓存里面的数据如何与数据库保持一致
+     * @return
+     */
+    public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithRedissonLock() {
+//        占用分布式锁，去redis占坑  锁的粒度，越细越块
+//        锁的粒度： 具体缓存的是某个数据 ，11号商品，product-11-lock
+        RLock lock = redissonClient.getLock("CatalogJson-lock");
+        lock.lock();
+        Map<String, List<Catalog2Vo>> dataFromDb;
+        try{
+            dataFromDb  = getDataFromDb();
+        }finally {
+            lock.unlock();
+        }
+        return dataFromDb;
+    }
+
+
     public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithRedisLock() {
 //        占用分布式锁，去redis占坑
         String uuid = UUID.randomUUID().toString();
