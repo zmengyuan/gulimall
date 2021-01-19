@@ -126,7 +126,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     //每一个需要缓存的数据，我们都需要来指定要放到哪个名字的缓存中。通常按照业务类型进行划分。category是缓存区的概念
-    @Cacheable(value = {"category"})
+//    @Cacheable(value = {"category"},key = "#root.method.name")
+    @Cacheable(value = {"category"},key = "'category'")
     @Override
     public List<CategoryEntity> getLevel1Catagories() {
         List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
