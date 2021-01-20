@@ -10,6 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -120,7 +121,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * @CacheEvict 缓存失效，指明哪个value,哪个key删除
      * @param category
      */
-    @CacheEvict(value = {"category"},key = "'getLevel1Catagories'")
+    @Caching(evict={
+            @CacheEvict(value = {"category"},key = "'getLevel1Catagories'"),
+            @CacheEvict(value = {"category"},key = "'getCatelogJson'")
+    })
+//    @CacheEvict(value = {"category"},allEntries = true)//也可以这样 清除该分区下的所有缓存
     @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
