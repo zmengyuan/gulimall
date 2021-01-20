@@ -23,11 +23,15 @@ public class MyCacheConfig {
      * @EnableConfigurationProperties(CacheProperties.class)
      * @return
      */
-    @Autowired
-    CacheProperties cacheProperties;
+//   @Autowired
+//   CacheProperties cacheProperties;
 
+    /**
+     * 另外一种方式
+     * 这个方法就是给容器中放东西，那么方法中的参数它都会去容器中找
+     */
     @Bean
-    RedisCacheConfiguration redisCacheConfiguration() {
+    RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
 
         config = config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
