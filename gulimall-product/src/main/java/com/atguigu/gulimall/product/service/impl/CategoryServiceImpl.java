@@ -120,7 +120,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * @CacheEvict 缓存失效，指明哪个value,哪个key删除
      * @param category
      */
-    @CacheEvict(value = {"category"},key = "'category'")
+    @CacheEvict(value = {"category"},key = "'getLevel1Catagories'")
     @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
@@ -129,8 +129,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     //每一个需要缓存的数据，我们都需要来指定要放到哪个名字的缓存中。通常按照业务类型进行划分。category是缓存区的概念
-//    @Cacheable(value = {"category"},key = "#root.method.name")
-    @Cacheable(value = {"category"},key = "'category'")
+    @Cacheable(value = {"category"},key = "#root.method.name")
+//    @Cacheable(value = {"category"},key = "'category'")
     @Override
     public List<CategoryEntity> getLevel1Catagories() {
         List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
@@ -138,8 +138,56 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 //        return null;
     }
 
+    /*
+    version5 实现缓存与业务逻辑的解耦合
+     */
+    @Cacheable(value = {"category"},key = "#root.methodName")
     @Override
-    public Map<String, List<Catalog2Vo>> getCatelogJson() {
+    public Map<String, List<Catalog2Vo>> getCatelogJson(){
+         /*
+        1、将数据库的所有分类一次性查询
+         */
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+
+        //查出所有1级分类
+        List<CategoryEntity> level1Category = getParentCid(selectList, 0L);
+
+        Map<String, List<Catalog2Vo>> parent_cid = level1Category.stream().collect(Collectors.toMap(k -> {
+            return k.getCatId().toString();
+        }, v -> {
+            //查询到当前的二级分类
+            List<CategoryEntity> categoryEntities = getParentCid(selectList, v.getCatId());
+            //封装成返回需要的Catelog2Vo
+            List<Catalog2Vo> catalog2Vos = null;
+            if (!CollectionUtils.isEmpty(categoryEntities)) {
+                catalog2Vos = categoryEntities.stream().map(l2 -> {
+                    Catalog2Vo catalog2Vo = new Catalog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
+                    //1、找当前二级分类的三级分类封装vo
+                    List<CategoryEntity> level3Catelog = getParentCid(selectList, l2.getCatId());
+                    if (level3Catelog != null) {
+                        List<Catalog2Vo.Catalog3Vo> collect = level3Catelog.stream().map(l3 -> {
+                            //2、封装成指定格式
+                            Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo(l2.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                            return catalog3Vo;
+                        }).collect(Collectors.toList());
+                        catalog2Vo.setCatalog3List(collect);
+                    }
+
+                    return catalog2Vo;
+                }).collect(Collectors.toList());
+            }
+
+            return catalog2Vos;
+        }));
+
+        return parent_cid;
+    }
+
+    /*
+    此版本的外部部分 的缓存是自己写的，与业务数据耦合
+    version 2,3,4
+     */
+    public Map<String, List<Catalog2Vo>> getCatelogJson2() {
         /*
         1、空结果缓存，解决缓存穿透
         2、设置过期时间（随机值），解决缓存雪崩
@@ -162,6 +210,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
+     * version4 一次性查库，添加reddssion锁
      * 缓存里面的数据如何与数据库保持一致
      * @return
      */
@@ -179,7 +228,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return dataFromDb;
     }
 
-
+    /*
+    version3 一次性查库，添加redis锁
+     */
     public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithRedisLock() {
 //        占用分布式锁，去redis占坑
         String uuid = UUID.randomUUID().toString();
@@ -260,7 +311,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return parent_cid;
     }
 
-
+    /*
+    version2 一次性查询库  并且添加本地锁
+     */
     //一次性查询全部；从数据查询并封装分类数据  解决缓存击穿，加锁
     public Map<String, List<Catalog2Vo>> getCatelogJsonFromDbWithLocalLock() {
         /**
@@ -285,13 +338,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
- * 逻辑是
- * （1）根据一级分类，找到对应的二级分类
- * （2）将得到的二级分类，封装到Catelog2Vo中
- * （3）根据二级分类，得到对应的三级分类
- * （3）将三级分类封装到Catalog3List
- * @return
-*/
+     *
+     * version1 循环查询库
+     * 逻辑是
+     * （1）根据一级分类，找到对应的二级分类
+     * （2）将得到的二级分类，封装到Catelog2Vo中
+     * （3）根据二级分类，得到对应的三级分类
+     * （3）将三级分类封装到Catalog3List
+     * @return
+     */
     public Map<String, List<Catalog2Vo>> oldgetCatelogJson() {
         //查出所有1级分类
         List<CategoryEntity> level1Category = getLevel1Catagories();
