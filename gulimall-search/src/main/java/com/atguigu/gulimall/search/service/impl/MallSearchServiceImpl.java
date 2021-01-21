@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 public class MallSearchServiceImpl implements MallSearchService {
     @Override
     public SearchResult search(SearchParam searchParam) {
+
+
         return null;
     }
 }
