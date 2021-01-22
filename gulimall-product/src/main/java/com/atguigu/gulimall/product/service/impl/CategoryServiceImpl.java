@@ -63,7 +63,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //2、树型结构
         //2.1 找到所有一级分类
         List<CategoryEntity> level1 = categoryEntities.stream().filter((t) -> {
-            return t.getParentCid().equals("0");
+            return t.getParentCid().toString().equals("0");
 //            return t.getParentCid() == 0;
         }).map((menu) -> {
             menu.setChildren(getChildrens(menu,categoryEntities));
