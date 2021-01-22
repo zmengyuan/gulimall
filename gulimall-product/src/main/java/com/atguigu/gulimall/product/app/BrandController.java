@@ -73,6 +73,7 @@ public class BrandController {
 //
 //        }
 
+        brand.setLogo("logo写死");
 		brandService.save(brand);
 
         return R.ok();
@@ -84,6 +85,16 @@ public class BrandController {
     @RequestMapping("/update")
     public R update(@RequestBody BrandEntity brand){
 		brandService.updateDetail(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改状态
+     */
+    @RequestMapping("/update/status")
+    public R updateStatus( @RequestBody BrandEntity brand){
+        brandService.updateById(brand);
 
         return R.ok();
     }
