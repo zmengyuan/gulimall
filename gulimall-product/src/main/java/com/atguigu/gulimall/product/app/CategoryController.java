@@ -38,7 +38,7 @@ public class CategoryController {
     public R listWithTree(){
         List<CategoryEntity> list  = categoryService.listWithTree();
 
-        return R.ok().put("page", list);
+        return R.ok().put("data", list);
     }
 
     /**
