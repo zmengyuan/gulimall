@@ -44,6 +44,20 @@ public class ThreadTest {
     public <U> CompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> var1)
     public <U> CompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> var1, Executor var2)
 
+    五、两任务组合——都要完成
+    runAfterBoth:组合两个future,不需要获取future的结果，只需要两个future处理完结果后，处理该任务。任务3是任务1和2都执行完才能执行
+    thenAcceptBoth：组合两个future，获取两个future任务的结果，然后处理任务，没有返回值
+    thenCombine 组合两个future,获取两个future的返回结果，并返回当前任务的返回值
+
+    六 两任务组合——只要一个完成
+    runAfterEither
+    acceptEither
+    applyToEither
+
+    七 多任务组合
+    - 都完成
+    - 任一一个完成
+
      */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("方法开始");
@@ -121,17 +135,41 @@ public class ThreadTest {
             System.out.println("上一步的结果："+t);
         },service);*/
 
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            System.out.println("当前线程：" + Thread.currentThread().getId());
-            int i = 10 / 5;
-            System.out.println("当前运行结果:" + i);
-            return i;
-        }, service).thenApplyAsync(res -> {
-            System.out.println("任务2启动了。。。。" + res);
-            return "hello" + res;
-        }, service);
+//        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+//            System.out.println("当前线程：" + Thread.currentThread().getId());
+//            int i = 10 / 5;
+//            System.out.println("当前运行结果:" + i);
+//            return i;
+//        }, service).thenApplyAsync(res -> {
+//            System.out.println("任务2启动了。。。。" + res);
+//            return "hello" + res;
+//        }, service);
 
-        System.out.println("方法结束"+future.get());
+        /*
+        多任务
+         */
+        CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("查询商品的属性");
+            return "黑色+256g";
+        },service);
+        CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("查询商品的图片");
+            return "图片地址";
+        },service);
+        CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("查询商品价格");
+            return "23";
+        },service);
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(future1, future2, future3);
+        allOf.get();
+
+
+        System.out.println("方法结束");
     }
 
 
