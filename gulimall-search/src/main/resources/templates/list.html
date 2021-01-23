@@ -1028,9 +1028,10 @@
                     <!--综合排序-->
                     <div class="filter_top">
                         <div class="filter_top_left">
-                            <a href="#">综合排序</a>
-                            <a href="#">销量</a>
-                            <a href="#">价格</a>
+                            <a class="sort_a"
+                               sort="hotScore" href="#">综合排序</a>
+                            <a class="sort_a" sort="saleCount" href="#">销量</a>
+                            <a class="sort_a" sort="skuPrice" href="#">价格</a>
                             <a href="#">评论分</a>
                             <a href="#">上架时间</a>
                         </div>
@@ -1996,6 +1997,7 @@
      * @returns {string} 替换或添加后的url
      */
     function replaceParamVal(url, paramName, replaceVal,forceAdd) {
+        //如果没有就添加，有就替换
         var oUrl = url.toString();
         var nUrl;
         if (oUrl.indexOf(paramName) != -1) {
@@ -2018,12 +2020,49 @@
         }
         return nUrl;
     };
-
+    //分页点击事件
     $(".page_a").click(function () {
         var pn=$(this).attr("pn");
         location.href=replaceParamVal(location.href,"pageNum",pn,false);
         console.log(replaceParamVal(location.href,"pageNum",pn,false))
     })
+
+    //排序点击事件
+    $(".sort_a").click(function () {
+        //1、改变样式
+        changeStyle(this);
+
+        //2、跳转到指定位置  sort=skuPrice_asc/desc
+        // //获取sort属性值并进行url跳转
+        let sort = $(this).attr("sort");
+        sort = $(this).hasClass("desc") ? sort + "_desc" : sort + "_asc";
+        location.href = replaceParamVal(location.href, "sort", sort,false);
+        //禁用默认行为，就是a标签不能跳了
+        return false;
+    });
+
+    function changeStyle(ele){
+        //清空之前的
+        $(".sort_a").css({"color":"#333","border-color":"#CCC","background":"#FFF"});
+        $(".sort_a").each(function() {
+            var text = $(this).text().replace("⬇","").replace("⬆","");
+            $(this).text(text) ;
+        })
+        //当前被点击的元素变为选中
+        $(ele).css({"color":"#FFF","border-color":"#e4393c","background":"#e4393c"});
+        // 改变升降序 切换样式 加上就是降序，不加就是升序
+        $(ele).toggleClass("desc");
+        if ($(ele).hasClass("desc")) {
+            //降序
+            var text = $(ele).text().replace("⬇","").replace("⬆","");
+            text = text +"⬇";
+            $(ele).text(text) ;
+        }else {
+            var text = $(ele).text().replace("⬇","").replace("⬆","");
+            text = text +"⬆";
+            $(ele).text(text) ;
+        }
+    }
 </script>
 </body>
 </html>
