@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class SearchParam {
     // 检索关键字
-    private String keyWord;
+    private String keyword;
 //    三级分类id
     private Long catalog3Id;
     /*

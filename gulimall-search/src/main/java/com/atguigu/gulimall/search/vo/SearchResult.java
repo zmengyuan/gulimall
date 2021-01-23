@@ -26,6 +26,8 @@ public class SearchResult {
     //当前查询到的结果，所有涉及到的分类
     private List<CatalogVo> catalogs;
 
+    private List<AttrVo> attrs;
+
 
 //=====================以上是返给页面的信息==========================
     @Data

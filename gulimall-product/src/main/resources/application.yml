@@ -31,4 +31,8 @@ server:
 logging:
   level:
     com.atguigu.gulimall: debug
-
+ribbon:
+  #建立连接超时时间
+  ConnectTimeout: 5000
+  #建立连接之后，读取响应资源超时时间
+  ReadTimeout: 5000
