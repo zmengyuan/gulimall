@@ -9,7 +9,35 @@ import java.util.concurrent.*;
  */
 public class ThreadTest {
     public static ExecutorService service = Executors.newFixedThreadPool(10);
+
+    /*
+    创建和启动异步任务
+    public static CompletableFuture<Void> runAsync(Runnable runnable)//默认线程池
+    public static CompletableFuture<Void> runAsync(Runnable runnable, Executor executor)//指定线程池
+    public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier)//有返回值
+    public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor)
+     */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
+        System.out.println("方法开始");
+        /*CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            System.out.println("当前线程：" + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("当前运行结果:" + i);
+        }, service);*/
+
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程：" + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("当前运行结果:" + i);
+            return i;
+        }, service);
+        Integer i = future.get();
+        System.out.println(i);
+        System.out.println("方法结束");
+    }
+
+
+    public static void main1(String[] args) throws ExecutionException, InterruptedException {
 //        Thread01 thread01 = new Thread01();
 //        thread01.start();//启动线程
 
