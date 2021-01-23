@@ -2002,12 +2002,7 @@
 
     function searchProducts(name,value){
         //原来的页面
-        var href = location.href + "";
-        if (href.indexOf("?") != -1){
-            location.href = location.href + "&" +name+ "=" + value;
-        }else {
-            location.href = location.href + "?" +name+ "=" + value;
-        }
+        location.href = replaceParamVal(location.href,"keyword",value);
     }
     function searchByKeyword(){
         searchProducts("keyword",$("#keyword_input").val());
