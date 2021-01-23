@@ -11,13 +11,13 @@ public class ThreadTest {
     public static ExecutorService service = Executors.newFixedThreadPool(10);
 
     /*
-    创建和启动异步任务
+    一、创建和启动异步任务
     public static CompletableFuture<Void> runAsync(Runnable runnable)//默认线程池
     public static CompletableFuture<Void> runAsync(Runnable runnable, Executor executor)//指定线程池
     public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier)//有返回值
     public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor)
 
-    当前一个任务执行完成，可以继续后面写代码。或者使用CompletableFuture提供的以下方法
+    二、当前一个任务执行完成，可以继续后面写代码。或者使用CompletableFuture提供的以下方法
     //可以处理异常，无返回值
     public CompletableFuture<T> whenComplete(BiConsumer<? super T,? super Throwable> action)//使用前一个相同线程执行
     public CompletableFuture<T> whenCompleteAsync(BiConsumer<? super T,? super Throwable> action)//前一个成功以后，这个任务还是以异步的方式执行，交给线程池执行
@@ -25,10 +25,24 @@ public class ThreadTest {
     //可以处理异常，有返回值
     public CompletableFuture<T> exceptionally(Function<Throwable,? extends T> fn)
 
-    //可以直接感知异常并处理
+    三、可以直接感知异常并处理
     public <U> CompletionStage<U> handle(BiFunction<? super T, Throwable, ? extends U> fn);
     public <U> CompletionStage<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> fn);
     public <U> CompletionStage<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> fn,Execut
+
+    四、串行化
+    先执行A再执行B
+    public CompletableFuture<Void> thenRun(Runnable var1)
+    public CompletableFuture<Void> thenRunAsync(Runnable var1)
+    public CompletableFuture<Void> thenRunAsync(Runnable var1, Executor var2)
+    先执行A再执行B，但是需要A的结果
+    public CompletableFuture<Void> thenAccept(Consumer<? super T> var1)
+    public CompletableFuture<Void> thenAcceptAsync(Consumer<? super T> var1)
+    public CompletableFuture<Void> thenAcceptAsync(Consumer<? super T> var1, Executor var2)
+    先执行A再执行B，需要A的结果并且本身也要返回值
+    public <U> CompletableFuture<U> thenApply(Function<? super T, ? extends U> var1)
+    public <U> CompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> var1)
+    public <U> CompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> var1, Executor var2)
 
      */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
@@ -61,7 +75,7 @@ public class ThreadTest {
 //            return 10;
 //        });
 
-        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+        /*CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
             System.out.println("当前线程：" + Thread.currentThread().getId());
             int i = 10 / 0;
             System.out.println("当前运行结果:" + i);
@@ -74,10 +88,50 @@ public class ThreadTest {
                 return 0;
             }
             return 0;
-        });
-        Integer f = future.get();
+        });*/
+        /*
+        线程串行化
+        1）thenRunAsync 不能获取上一步的结果
+         */
+        /*CompletableFuture<Void> future1 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程：" + Thread.currentThread().getId());
+            int i = 10 / 5;
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("当前运行结果:" + i);
+            return i;
+        }, service).thenRunAsync(() -> {
+            System.out.println("任务2启动了");
+        },service);*/
 
-        System.out.println("方法结束"+f);
+        /*CompletableFuture<Void> future1 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程：" + Thread.currentThread().getId());
+            int i = 10 / 5;
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("当前运行结果:" + i);
+            return i;
+        }, service).thenAcceptAsync((t) -> {
+            System.out.println("上一步的结果："+t);
+        },service);*/
+
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程：" + Thread.currentThread().getId());
+            int i = 10 / 5;
+            System.out.println("当前运行结果:" + i);
+            return i;
+        }, service).thenApplyAsync(res -> {
+            System.out.println("任务2启动了。。。。" + res);
+            return "hello" + res;
+        }, service);
+
+        System.out.println("方法结束"+future.get());
     }
 
 
