@@ -24,6 +24,12 @@ public class ThreadTest {
     public CompletableFuture<T> whenCompleteAsync(BiConsumer<? super T,? super Throwable> action, Executor executor)
     //可以处理异常，有返回值
     public CompletableFuture<T> exceptionally(Function<Throwable,? extends T> fn)
+
+    //可以直接感知异常并处理
+    public <U> CompletionStage<U> handle(BiFunction<? super T, Throwable, ? extends U> fn);
+    public <U> CompletionStage<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> fn);
+    public <U> CompletionStage<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> fn,Execut
+
      */
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("方法开始");
@@ -42,17 +48,32 @@ public class ThreadTest {
         Integer i = future.get();
         System.out.println(i);*/
 
+//        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+//            System.out.println("当前线程：" + Thread.currentThread().getId());
+//            int i = 10 / 0;
+//            System.out.println("当前运行结果:" + i);
+//            return i;
+//        }, service).whenComplete((t,v) -> {
+//            //t 是结果  v是异常  虽然能知道异常信息，但是没法修改异常数据
+//            System.out.println("打印异步任务成功后的t:{"+t+"}，v是：{"+v+"}");
+//        }).exceptionally(throww -> {
+//            //可以感知异常，并且处理异常返回
+//            return 10;
+//        });
+
         CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
             System.out.println("当前线程：" + Thread.currentThread().getId());
             int i = 10 / 0;
             System.out.println("当前运行结果:" + i);
             return i;
-        }, service).whenComplete((t,v) -> {
-            //t 是结果  v是异常  虽然能知道异常信息，但是没法修改异常数据
-            System.out.println("打印异步任务成功后的t:{"+t+"}，v是：{"+v+"}");
-        }).exceptionally(throww -> {
-            //可以感知异常，并且处理异常返回
-            return 10;
+        }, service).handle((result,ex) -> {
+            if (result != null){
+                return result*2;
+            }
+            if (ex != null){
+                return 0;
+            }
+            return 0;
         });
         Integer f = future.get();
 
