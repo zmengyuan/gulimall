@@ -24,7 +24,7 @@ public class SearchParam {
     /*
      * 好多的过滤条件
      * hasStock(是否有货)、skuPrice区间、brandId、catalog3Id、attrs
-     * hasStock=0/1   0-有货 1-无货
+     * hasStock=0/1   1-有库存 其他或空均是无库存
      * skuPrice=1_500/_500/500_
      */
     private Integer hasStock;//是否只显示有货

@@ -1165,8 +1165,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i></i>
+                                    <a href="#" th:with="check = ${param.hasStock}">
+                                        <input id="showHasStock" type="checkbox" th:checked="${#strings.equals(check,'1')}">
                                         仅显示有货
                                     </a>
                                 </li>
@@ -2087,6 +2087,23 @@
             $(ele).text(text) ;
         }
     }
+    //价格区间确定按钮
+    $("#skuPriceSearchBtn").click(function () {
+        var skuPriceFrom = $("#skuPriceFrom").val();
+        var skuPriceTo = $("#skuPriceTo").val();
+        location.href = replaceParamVal(location.href, "skuPrice", skuPriceFrom + "_" + skuPriceTo, false);
+    })
+//仅显示有货
+    $("#showHasStock").change(function(){
+        if ($(this).prop('checked')){
+            location.href = replaceParamVal(location.href, "hasStock", 1, false);
+        }else {
+            //没选中
+            var re = eval('/(hasStock=)([^&]*)/gi');
+            location.href = (location.href+"").replace(re,'');
+        }
+        return false;
+    })
 </script>
 </body>
 </html>

@@ -180,7 +180,7 @@ public class MallSearchServiceImpl implements MallSearchService {
             boolQuery.filter(QueryBuilders.termsQuery("brandId",param.getBrandId()));
         }
         //1.2.3 filter-按照是否有库存进行查询
-        if (null != param.getHasStock() ) {
+        if (null != param.getHasStock() && param.getHasStock().toString().equals("1")) {
             boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
         }
         //1.2.4 filter-按照区间进行查询  1_500/_500/500_
