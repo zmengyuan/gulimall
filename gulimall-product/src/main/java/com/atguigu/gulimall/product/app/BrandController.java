@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.app;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.atguigu.common.valid.group.AddGroup;
@@ -50,6 +51,13 @@ public class BrandController {
 		BrandEntity brand = brandService.getById(brandId);
 
         return R.ok().put("brand", brand);
+    }
+
+    @RequestMapping("/infos")
+    public R info(@RequestParam("brandIds") List<Long> brandIds){
+        List<BrandEntity> brands = brandService.getBrandsById(brandIds);
+
+        return R.ok().put("brands", brands);
     }
 
     /**

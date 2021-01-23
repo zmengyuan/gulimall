@@ -9,6 +9,7 @@ import com.atguigu.gulimall.search.constant.EsConstant;
 import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.MallSearchService;
 import com.atguigu.gulimall.search.vo.AttrResponseVo;
+import com.atguigu.gulimall.search.vo.BrandVo;
 import com.atguigu.gulimall.search.vo.SearchParam;
 import com.atguigu.gulimall.search.vo.SearchResult;
 import org.apache.lucene.search.join.ScoreMode;
@@ -200,10 +201,47 @@ public class MallSearchServiceImpl implements MallSearchService {
             }).collect(Collectors.toList());
             result.setNavs(navVos);
         }
+        //把品牌也弄上面包屑
+        //品牌、分类
+        if (null != param.getBrandId() && param.getBrandId().size() > 0) {
+            List<SearchResult.NavVo> navs = result.getNavs();
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            navVo.setNavName("品牌");
+            // 远程查询所有品牌
+            R r = productFeignService.brandInfo(param.getBrandId());
+            if (0 == r.getCode()) {
+                List<BrandVo> brands = r.getData("brands", new TypeReference<List<BrandVo>>() {
+                });
+                StringBuffer buffer = new StringBuffer();
+                String replace = "";
+                for (BrandVo brand : brands) {
+                    buffer.append(brand.getName() + ";");
+                    replace = replaceQueryString(param, brand.getBrandId() + "", "brandId");
+                }
+                navVo.setNavValue(buffer.toString());
+                navVo.setLink("http://search.gulimall.com/list.html" + (replace.isEmpty() ? "" : "?" + replace));
+            }
+            navs.add(navVo);
+        }
+
+
 
 
         return result;
     }
+
+    private String replaceQueryString(SearchParam param, String value,String key) {
+        String queryString = param.get_queryString();
+        String encode = null;
+        try {
+            encode = URLEncoder.encode(value, "UTF-8");
+            encode = encode.replace("+","20%");//浏览器对空格编码和java不一样
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return queryString.replace("&"+key+"=" + encode, "");
+    }
+
 
     /**
      * 准备检索请求
