@@ -35,6 +35,7 @@ public class SearchResult {
 //=====================以上是返给页面的信息==========================
     //面包屑导航数据
     private List<NavVo> navs = new ArrayList<>();
+    private List<Long> attrIds = new ArrayList<>();
 
     @Data
     public static class NavVo{

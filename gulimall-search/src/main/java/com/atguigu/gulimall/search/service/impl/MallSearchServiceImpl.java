@@ -12,6 +12,7 @@ import com.atguigu.gulimall.search.vo.AttrResponseVo;
 import com.atguigu.gulimall.search.vo.BrandVo;
 import com.atguigu.gulimall.search.vo.SearchParam;
 import com.atguigu.gulimall.search.vo.SearchResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -43,7 +44,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 public class MallSearchServiceImpl implements MallSearchService {
 
@@ -172,8 +173,10 @@ public class MallSearchServiceImpl implements MallSearchService {
                 //6.1 设置属性值
                 navVo.setNavValue(split[1]);
                 //6.2 查询并设置属性名
+                result.getAttrIds().add(Long.parseLong(split[0]));
                 try {
                     R r = productFeignService.attrInfo(Long.parseLong(split[0]));
+
                     if (r.getCode() == 0) {
                         AttrResponseVo attrResponseVo = JSON.parseObject(JSON.toJSONString(r.get("attr")), new TypeReference<AttrResponseVo>() {
                         });
@@ -182,7 +185,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                         navVo.setNavName(split[0]);
                     }
                 } catch (Exception e) {
-
+                    log.error("远程查询属性名失败",e);
                 }
                 //6.3 设置面包屑跳转链接(当点击该链接时剔除点击属性)
                 //取消了这个面包屑以后，我们就要跳转到那个地方，将请求地址的url里面的当前置空

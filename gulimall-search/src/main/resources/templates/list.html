@@ -843,13 +843,13 @@
                 </div>
 
                 <!--其他需要展示的属性-->
-                <div class="JD_pre" th:each="attr: ${result.getAttrs()}">
+                <div class="JD_pre" th:each="attr: ${result.attrs}" th:if="${!#lists.contains(result.attrIds,attr.attrId)}">
                     <div class="sl_key">
-                        <span th:text="${attr.getAttrName()}">系统：</span>
+                        <span th:text="${attr.attrName}">系统：</span>
                     </div>
                     <div class="sl_value">
                         <ul>
-                            <li th:each="val: ${attr.getAttrValue()}">
+                            <li th:each="val: ${attr.attrValue}">
                                 <a href="#"
                                    th:text="${val}"
                                    th:href="${'javascript:searchProducts(&quot;attrs&quot;,&quot;'+attr.attrId+'_'+val+'&quot;)'}">0-安卓（Android）</a></li>
