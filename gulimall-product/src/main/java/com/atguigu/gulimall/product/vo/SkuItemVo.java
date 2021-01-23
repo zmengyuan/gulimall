@@ -10,6 +10,7 @@ import java.util.List;
 public class SkuItemVo {
     //1、sku基本信息 pms_sku_info
     SkuInfoEntity info;
+    boolean hasStock = true;
     //2、sku图片信息 pms_sku_images
     List<SkuImagesEntity> images;
 
