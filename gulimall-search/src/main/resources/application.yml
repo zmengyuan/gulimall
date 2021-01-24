@@ -7,9 +7,13 @@ spring:
     name: gulimall-search
   thymeleaf:
     cache: false
+  redis:
+    host: 192.168.56.9
+    port: 6379
+  session:
+    store-type: redis
 server:
   port: 9097
 logging:
   level:
     com.atguigu.gulimall: debug
-
