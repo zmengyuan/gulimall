@@ -1,22 +1,23 @@
 package com.atguigu.gulimall.auth.controller;
 
+import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.auth.feign.ThirdPartFeignService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-//@Controller
+@Controller
 public class LoginController {
-    /*
-    发送一个请求直接跳转到页面
-    SpringMVC viewController 将请求和页面映射过来
-     */
+    @Autowired
+    ThirdPartFeignService thirdPartFeignService;
 
-    @GetMapping("/login.html")
-    public String loginPage(){
-        return "login";
-    }
-
-    @GetMapping("/reg.html")
-    public String regPage(){
-        return "reg";
+    @ResponseBody
+    @GetMapping("/sms/sendcode")
+    public R sendCode(@RequestParam("phone") String phone){
+        String code = String.valueOf((int)((Math.random() + 1) * 100000));
+        thirdPartFeignService.sendCode(phone,code);
+        return R.ok();
     }
 }

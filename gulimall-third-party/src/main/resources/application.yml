@@ -14,7 +14,7 @@ spring:
         path: /fsms132
         skin: 1
         sign: 1
-        appcode:xxx
+        appcode: xxx
   application:
     name: gulimall-third-party
 
