@@ -38,6 +38,12 @@ public class CartController {
         System.out.println(userInfoTo);
         return "cartList";
     }
+
+    /*
+    RedirectAttributes ra
+    ra.addFlashAttribute()是将数据放到session中，可以从页面取出，但是只能取一次
+    addAttribute是将数据放到url后面
+     */
 //    防止在success当前页面不停刷新 重复提交表单，所以重定向到一个新页面
     @GetMapping("/addToCart")
     public String addToCart(@RequestParam("skuId") Long skuId,
