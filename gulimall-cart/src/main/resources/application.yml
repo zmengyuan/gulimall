@@ -5,6 +5,9 @@ spring:
         server-addr: 127.0.0.1:8848
   application:
     name: gulimall-cart
+  redis:
+    host: 192.168.56.9
+    port: 6379
 server:
   port: 9096
 logging:
