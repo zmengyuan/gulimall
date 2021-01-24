@@ -3,13 +3,16 @@ package com.atguigu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.gulimall.member.exception.PhoneExistException;
+import com.atguigu.gulimall.member.exception.UserNameExistException;
 import com.atguigu.gulimall.member.feign.CouponFeignService;
+import com.atguigu.gulimall.member.vo.MemberRegistVo;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.member.entity.MemberEntity;
 import com.atguigu.gulimall.member.service.MemberService;
@@ -39,6 +42,20 @@ public class MemberController {
         memberEntity.setNickname("张三");
         R membercoupons = couponFeignService.membercoupons();
         return R.ok().put("member",memberEntity).put("coupons",membercoupons.get("coupons"));
+    }
+
+    @PostMapping("/regist")
+    public R regist(@RequestBody MemberRegistVo vo){
+        try{
+            memberService.regist(vo);
+            //异常机制：通过捕获对应的自定义异常判断出现何种错误并封装错误信息
+        }catch (PhoneExistException e){
+            return R.error(BizCodeEnum.PHONE_EXIST_EXCEPTION.getCode(),BizCodeEnum.PHONE_EXIST_EXCEPTION.getMsg());
+        }catch (UserNameExistException e){
+            return R.error(BizCodeEnum.USER_EXIST_EXCEPTION.getCode(),BizCodeEnum.USER_EXIST_EXCEPTION.getMsg());
+        }
+        return R.ok();
+
     }
 
     /**

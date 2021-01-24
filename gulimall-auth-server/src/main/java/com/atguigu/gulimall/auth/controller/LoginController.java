@@ -1,8 +1,10 @@
 package com.atguigu.gulimall.auth.controller;
 
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.constant.AuthServerConstant;
 import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.auth.feign.MemberFeignService;
 import com.atguigu.gulimall.auth.feign.ThirdPartFeignService;
 import com.atguigu.gulimall.auth.vo.UserRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -29,6 +32,8 @@ public class LoginController {
     StringRedisTemplate stringRedisTemplate;
     @Autowired
     ThirdPartFeignService thirdPartFeignService;
+    @Autowired
+    MemberFeignService memberFeignService;
 
     @ResponseBody
     @GetMapping("/sms/sendcode")
@@ -85,7 +90,38 @@ public class LoginController {
             return "redirect:http://auth.gulimall.com/reg.html";
         }
 
-
+        //1、校验验证码
+        String code = vo.getCode();
+        String s = stringRedisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
+        if (!StringUtils.isEmpty(s)) {
+            if (code.equals(s.split("_")[0])) {
+                //TODO 验证验证码 10分钟校验
+                //验证码通过,删除缓存中的验证码；令牌机制
+                stringRedisTemplate.delete(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
+                //真正注册调用远程服务注册
+                R r = memberFeignService.regist(vo);
+                if (r.getCode() == 0) {
+                    //成功
+                    return "redirect:http://auth.gulimall.com/login.html";
+                } else {
+                    Map<String, String> errors = new HashMap<>();
+                    errors.put("msg", r.getData(new TypeReference<String>() {
+                    }));
+                    redirectAttributes.addFlashAttribute("errors", errors);
+                }
+            } else {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("code", "验证码错误");
+                redirectAttributes.addFlashAttribute("errors", errors);
+                return "redirect:http://auth.gulimall.com/reg.html";
+            }
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "验证码错误");
+            redirectAttributes.addFlashAttribute("errors", errors);
+            //校验出错转发到注册页
+            return "redirect:http://auth.gulimall.com/reg.html";
+        }
 
         return "redirect:http://auth.gulimall.com/login.html";
     }
