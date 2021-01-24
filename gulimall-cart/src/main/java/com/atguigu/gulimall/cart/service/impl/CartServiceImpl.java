@@ -161,4 +161,13 @@ public class CartServiceImpl implements CartService {
         }
 
     }
+
+    @Override
+    public void checkItem(Long skuId, Integer check) {
+        BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+        CartItem cartItem = getCartItem(skuId);
+        cartItem.setCheck(check==1 ? true : false);
+        String jsonString = JSON.toJSONString(cartItem);
+        cartOps.put(skuId.toString(),jsonString);
+    }
 }
