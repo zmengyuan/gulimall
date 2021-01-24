@@ -96,4 +96,12 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, Object, Object> operations = stringRedisTemplate.boundHashOps(cartKey);
         return operations;
     }
+
+    @Override
+    public CartItem getCartItem(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+        String o = (String) cartOps.get(skuId.toString());
+        CartItem cartItem = JSON.parseObject(o, CartItem.class);
+        return cartItem;
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.concurrent.ExecutionException;
@@ -37,13 +38,23 @@ public class CartController {
         System.out.println(userInfoTo);
         return "cartList";
     }
-
+//    防止在success当前页面不停刷新 重复提交表单，所以重定向到一个新页面
     @GetMapping("/addToCart")
     public String addToCart(@RequestParam("skuId") Long skuId,
                             @RequestParam("num") Integer num,
-                            Model model) throws ExecutionException, InterruptedException {
+                            RedirectAttributes model) throws ExecutionException, InterruptedException {
         CartItem cartItem = cartService.addToCart(skuId,num);
+//        model.addAttribute("item",cartItem);
+//        return "success";
+        model.addAttribute("skuId",skuId);
+        return "redirect:http://cart.gulimall.com/addToCartSuccess.html";
+    }
+
+    @GetMapping("/addToCartSuccess.html")
+    public String addToCartSuccessPage(@RequestParam("skuId") Long skuId,Model model){
+        CartItem cartItem = cartService.getCartItem(skuId);
         model.addAttribute("item",cartItem);
         return "success";
     }
 }
+
