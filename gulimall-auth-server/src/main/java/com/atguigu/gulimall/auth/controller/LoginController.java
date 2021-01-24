@@ -52,16 +52,24 @@ public class LoginController {
         return R.ok();
     }
 
+    /**
+     * RedirectAttributes实际上是模拟session储存的，TODO 分布式下的session
+     * @param vo
+     * @param result
+     * @param redirectAttributes
+     * @return
+     */
     @PostMapping("/regist")
     public String regist(@Valid UserRegistVo vo, BindingResult result,
-                         Model model){
+                         RedirectAttributes redirectAttributes){
         if (result.hasErrors()) {
             Map<String, String> errors =result.getFieldErrors().stream().collect(Collectors.toMap(fieldError -> {
                  return fieldError.getField();
              },(fieldError) ->{
                  return fieldError.getDefaultMessage();
              }));
-            model.addAttribute("errors",errors);
+//            model.addAttribute("errors",errors);
+            redirectAttributes.addFlashAttribute("errors",errors);
 
 
             /**
