@@ -140,8 +140,7 @@ public class LoginController {
             log.info("登陆成功：用户信息"+loginUser.toString());
             //TODO 1、默认发的令牌。 session=dakadja; 作用域：当前域。（解决子域session共享问题）
             //TODO 2、使用json的序列化方式来序列化对象数据到redis中
-            session.setAttribute("loginUser", loginUser);
-
+            session.setAttribute(AuthServerConstant.LOGIN_USER, loginUser);
 
             return "redirect:http://gulimall.com";
         }else{
@@ -149,6 +148,17 @@ public class LoginController {
             errors.put("msg",login.getData("msg",new TypeReference<String>(){}));
             redirectAttributes.addFlashAttribute("errors",errors);
             return "redirect:http://auth.gulimall.com/login.html";
+        }
+    }
+
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session){
+        Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
+        if (attribute == null) {
+            //没登录
+            return "login";
+        } else{
+            return "redirect:http://gulimall.com";
         }
     }
 }
