@@ -8,6 +8,7 @@ import com.atguigu.gulimall.cart.config.MyThreadConfig;
 import com.atguigu.gulimall.cart.feign.ProductFeignService;
 import com.atguigu.gulimall.cart.interceptor.CartInterceptor;
 import com.atguigu.gulimall.cart.service.CartService;
+import com.atguigu.gulimall.cart.vo.Cart;
 import com.atguigu.gulimall.cart.vo.CartItem;
 import com.atguigu.gulimall.cart.vo.SkuInfoVo;
 import com.atguigu.gulimall.cart.vo.UserInfoVo;
@@ -15,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -103,5 +106,59 @@ public class CartServiceImpl implements CartService {
         String o = (String) cartOps.get(skuId.toString());
         CartItem cartItem = JSON.parseObject(o, CartItem.class);
         return cartItem;
+    }
+
+    @Override
+    public Cart getCart() throws ExecutionException, InterruptedException {
+        Cart cart = new Cart();
+        //1、登录
+        UserInfoVo userInfoTo = CartInterceptor.threadLocal.get();
+        if (userInfoTo.getUserId() != null){
+            String cartKey = CartConstant.CART_PREFIX + userInfoTo.getUserId();
+
+            //1.1、如果临时购物车的数据还没有合并【合并购物车】
+            String tempCartKey = CartConstant.CART_PREFIX + userInfoTo.getUserKey();
+            List<CartItem> tempsCartItems = getCartItems(tempCartKey);
+            if (tempsCartItems != null){
+                //临时购物车有数据，需要合并
+                for (CartItem item : tempsCartItems) {
+                    addToCart(item.getSkuId(),item.getCount());
+                }
+                //清除临时购物车的数据
+                clearCart(tempCartKey);
+            }
+
+            //1.2、获取登录后的购物车数据【包含合并过来的临时购物车的数据，和登录后的购物车数据 】
+            List<CartItem> cartItems = getCartItems(cartKey);
+            cart.setItems(cartItems);
+        }else {
+            //2、没登录
+            String cartKey = CartConstant.CART_PREFIX + userInfoTo.getUserKey();
+            //获取临时购物车的所有购物项
+            List<CartItem> cartItems = getCartItems(cartKey);
+            cart.setItems(cartItems);
+        }
+        return cart;
+    }
+
+    @Override
+    public void clearCart(String cartKey) {
+        stringRedisTemplate.delete(cartKey);
+    }
+
+    private List<CartItem> getCartItems(String cartKey) {
+        BoundHashOperations<String, Object, Object> hashOps = stringRedisTemplate.boundHashOps(cartKey);
+        List<Object> values = hashOps.values();
+        if (!CollectionUtils.isEmpty(values)) {
+            List<CartItem> collect = values.stream().map((obj) -> {
+                String str = (String) obj;
+                CartItem cartItem = JSON.parseObject(str, CartItem.class);
+                return cartItem;
+            }).collect(Collectors.toList());
+            return collect;
+        }else {
+            return null;
+        }
+
     }
 }

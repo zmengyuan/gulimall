@@ -3,6 +3,7 @@ package com.atguigu.gulimall.cart.controller;
 import com.atguigu.common.constant.AuthServerConstant;
 import com.atguigu.gulimall.cart.interceptor.CartInterceptor;
 import com.atguigu.gulimall.cart.service.CartService;
+import com.atguigu.gulimall.cart.vo.Cart;
 import com.atguigu.gulimall.cart.vo.CartItem;
 import com.atguigu.gulimall.cart.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,14 @@ public class CartController {
      * @return
      */
     @GetMapping("/cart.html")
-    public String cartListPage(){
+    public String cartListPage(Model model) throws ExecutionException, InterruptedException {
 
         //快速得到用户信息，id,user-key
-        UserInfoVo userInfoTo = CartInterceptor.threadLocal.get();
-        System.out.println(userInfoTo);
+//        UserInfoVo userInfoTo = CartInterceptor.threadLocal.get();
+//        System.out.println(userInfoTo);
+        Cart cart = cartService.getCart();
+        model.addAttribute("cart",cart);
+
         return "cartList";
     }
 
