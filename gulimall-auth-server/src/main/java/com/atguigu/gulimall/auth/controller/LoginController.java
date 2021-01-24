@@ -6,12 +6,13 @@ import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.auth.feign.MemberFeignService;
 import com.atguigu.gulimall.auth.feign.ThirdPartFeignService;
+import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.auth.vo.UserLoginVo;
 import com.atguigu.gulimall.auth.vo.UserRegistVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Controller
+@Slf4j
 public class LoginController {
 
     @Autowired
@@ -128,11 +131,18 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes){
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session){
         //远程登录
         R login = memberFeignService.login(vo);
         if (login.getCode() == 0){
             //成功
+            MemberRespVo loginUser = login.getData(new TypeReference<MemberRespVo>() {});
+            log.info("登陆成功：用户信息"+loginUser.toString());
+            //TODO 1、默认发的令牌。 session=dakadja; 作用域：当前域。（解决子域session共享问题）
+            //TODO 2、使用json的序列化方式来序列化对象数据到redis中
+            session.setAttribute("loginUser", loginUser);
+
+
             return "redirect:http://gulimall.com";
         }else{
             Map<String,String> errors = new HashMap<>();

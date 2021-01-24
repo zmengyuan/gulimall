@@ -10,8 +10,13 @@ spring:
   redis:
     host: 192.168.56.9
     port: 6379
+  session:
+    store-type: redis
 server:
   port: 9095
+  servlet:
+    session:
+      timeout: 30m
 logging:
   level:
     com.atguigu.gulimall: debug
