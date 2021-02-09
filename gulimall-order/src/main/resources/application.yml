@@ -21,6 +21,8 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual # 手动签收模式
+  thymeleaf:
+    cache: false
 mybatis-plus:
   mapper-location: classpath:/mapper/**/*.xml
   global-config:
