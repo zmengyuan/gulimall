@@ -21,12 +21,14 @@ public class GuliFeignConfig {
             public void apply(RequestTemplate requestTemplate) {
                 //1、RequestContextHolder拿到刚进来的请求
                 ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-                HttpServletRequest request = attributes.getRequest();//老请求
-                //同步请求头数据。Cookie
-                String cookie = request.getHeader("Cookie");
-                //给新请求同步了老请求的cookie
-                requestTemplate.header("Cookie",cookie);
-                System.out.println("feign远程之前先执行RequestInterceptor.apply()");
+                if (null != attributes) {
+                    HttpServletRequest request = attributes.getRequest();//老请求
+                    //同步请求头数据。Cookie
+                    String cookie = request.getHeader("Cookie");
+                    //给新请求同步了老请求的cookie
+                    requestTemplate.header("Cookie",cookie);
+                    System.out.println("feign远程之前先执行RequestInterceptor.apply()");
+                }
             }
         };
     }
