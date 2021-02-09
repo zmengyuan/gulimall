@@ -63,6 +63,8 @@ public class GulimallOrderApplicationTests {
         orderReturnApplyEntity.setReturnName("哈哈哈");
         //1、发送消息，如果发送的消息是个对象，我们会使用序列化机制，将对象写出去。对象必须实现Serializable
         String msg = "hello word";
+
+        //2、配置MyRabbitConfig，让发送的对象类型的消息，可以是一个json
         rabbitTemplate.convertAndSend("hello-java-exchange","hello.java",orderReturnApplyEntity);
         log.info("消息发送完成{}",msg);
     }
