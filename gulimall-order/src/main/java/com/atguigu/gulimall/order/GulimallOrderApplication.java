@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
@@ -21,6 +22,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * 5、监听消息，使用@RabbitListener标在类和方法上 必须有@EnableRabbit 。其实不监听可以不用@EnableRabbit
  * @RabbitHandler标在方法上，通过重载接收不同的消息
  */
+@EnableFeignClients
 @EnableRedisHttpSession
 @EnableDiscoveryClient
 @EnableRabbit
