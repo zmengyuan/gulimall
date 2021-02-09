@@ -16,7 +16,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  3、给配置文件中配置spring.rabbitmq
  * 3、@EnableRabbit
  *
- * 5、监听消息，使用@RabbitListener 必须有@EnableRabbit 。其实不监听可以不用@EnableRabbit
+ * 5、监听消息，使用@RabbitListener标在类和方法上 必须有@EnableRabbit 。其实不监听可以不用@EnableRabbit
+ * @RabbitHandler标在方法上。
  */
 @EnableRabbit
 @SpringBootApplication
