@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://192.168.56.9:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.56.9:8848
+  application:
+    name: gulimall-order
+  rabbitmq:
+    host: 192.168.56.9
+    port: 5672
+    virtual-host: /
+mybatis-plus:
+  mapper-location: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto  # id主键自增
+server:
+  port: 9092
+
+logging:
+  level:
+    com.atguigu.gulimall: debug
