@@ -24,6 +24,18 @@ public class OrderConfirmVo {
     @Getter@Setter
     Integer integration;
 
+    Integer count;
+    //总件数
+    public Integer getCount(){
+        Integer i = 0;
+        if (items != null){
+            for (OrderItemVo item : items) {
+                i += item.getCount();
+            }
+        }
+        return i;
+    }
+
     //订单总额
     BigDecimal total;
     public BigDecimal getTotal() {
