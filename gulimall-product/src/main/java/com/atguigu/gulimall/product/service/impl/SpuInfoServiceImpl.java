@@ -13,7 +13,6 @@ import com.atguigu.gulimall.product.feign.SearchFeignService;
 import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.*;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
