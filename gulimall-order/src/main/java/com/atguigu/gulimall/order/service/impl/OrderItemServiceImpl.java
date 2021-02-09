@@ -57,6 +57,26 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
 //        Thread.sleep(3000);
         System.out.println("消息处理完成=》"+content.getReturnName());
         System.out.println("接受到消息。。。。。内容："+message+"--类型："+message.getClass());//打印出来发现是org.springframework.amqp.core.Message类型
+
+        //channel内按顺序自增的
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        System.out.println("deliveryTag:"+deliveryTag);
+        //手动签收货物，非批量模式  模拟正常与错误
+        try{
+            if (deliveryTag % 2 == 0){
+                //收货
+                channel.basicAck(deliveryTag,false);
+                System.out.println("签收了货物。。。"+deliveryTag);
+            }else {
+                //退货requeue=false 丢弃  requeue=true发挥服务器，服务器重新入队。
+                channel.basicNack(deliveryTag,false,true);
+                System.out.println("没有签收货物..."+deliveryTag);
+            }
+
+        }catch (Exception e){
+            //网络中断
+        }
+
     }
 
     /**
