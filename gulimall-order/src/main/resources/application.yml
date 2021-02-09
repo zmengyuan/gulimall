@@ -29,7 +29,7 @@ mybatis-plus:
     db-config:
       id-type: auto  # id主键自增
 server:
-  port: 9092
+  port: 9100
 
 logging:
   level:
