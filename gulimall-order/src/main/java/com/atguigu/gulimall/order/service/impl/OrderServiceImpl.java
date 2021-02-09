@@ -53,6 +53,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //2、远程查询购物车所有选中的购物项
         List<OrderItemVo> items = cartFeignService.getCurrentUserCartItems();
         confirmVo.setItems(items);
+        //feign 在远程调用之前要构造请求，会调用很多的拦截器RequestInterceptor增强,它将原生的RequestTemplate
+
 
         //3、查询用户积分
         Integer integration = memberResponseVO.getIntegration();
