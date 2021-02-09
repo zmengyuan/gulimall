@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.order.service.impl;
 
+import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.entity.OrderReturnApplyEntity;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
@@ -18,7 +19,7 @@ import com.atguigu.gulimall.order.dao.OrderItemDao;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
 import com.atguigu.gulimall.order.service.OrderItemService;
 
-
+@RabbitListener(queues = {"hello-java-queue"})
 @Service("orderItemService")
 public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
 
@@ -44,7 +45,8 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
      *      *       1）、订单服务启动多个；同一个消息，只能有一个客户端收到
      *      *       2)、只有一个消息完全处理完，方法运行结束，我们就可以接收到下一个消息
      */
-    @RabbitListener(queues = {"hello-java-queue"})
+//    @RabbitListener(queues = {"hello-java-queue"})
+    @RabbitHandler
     public void receiverMessage(Message message, OrderReturnApplyEntity content,
                                 Channel channel) {
         //消息体
@@ -55,6 +57,16 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
 //        Thread.sleep(3000);
         System.out.println("消息处理完成=》"+content.getReturnName());
         System.out.println("接受到消息。。。。。内容："+message+"--类型："+message.getClass());//打印出来发现是org.springframework.amqp.core.Message类型
+    }
+
+    /**
+     * 用这个注解重载，可以直接定义不同的消息类型不同的接收
+     * @param orderEntity
+     */
+    @RabbitHandler
+    public void receiverMessage(OrderEntity orderEntity){
+        System.out.println("接收到消息...内容:" + orderEntity);
+
     }
 
 }
