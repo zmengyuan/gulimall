@@ -66,4 +66,6 @@ public class OrderConfirmVo {
     @Getter
     @Setter
     Map<Long,Boolean> stocks;
+    @Getter@Setter
+    private String orderToken;
 }
