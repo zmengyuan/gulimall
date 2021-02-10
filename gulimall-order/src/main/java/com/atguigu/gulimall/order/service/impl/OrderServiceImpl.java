@@ -8,14 +8,13 @@ import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginUserInterceptor;
-import com.atguigu.gulimall.order.vo.MemberAddressVo;
-import com.atguigu.gulimall.order.vo.OrderConfirmVo;
-import com.atguigu.gulimall.order.vo.OrderItemVo;
-import com.atguigu.gulimall.order.vo.SkuStockVo;
+import com.atguigu.gulimall.order.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,6 +33,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.service.OrderService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -123,6 +123,42 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         confirmVo.setOrderToken(token);
         CompletableFuture.allOf(getAddressFuture,cartFuture).get();
         return confirmVo;
+
+    }
+
+    @Override
+    public SubmitOrderResponseVo submitOrder(OrderSubmitVo submitVo) {
+        SubmitOrderResponseVo response = new SubmitOrderResponseVo();
+
+
+        MemberRespVo memberResponseVO = LoginUserInterceptor.loginUser.get();
+        /*
+        1、验证令牌 令牌的对比和删除必须保证原子性
+        0- 令牌失败  1-删除成功
+         */
+        String orderToken = submitVo.getOrderToken();
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        //原子验证令牌
+        Long result = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class)
+                , Arrays.asList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberResponseVO.getId())
+                , orderToken);
+        if (result == 0L) {
+            //令牌验证失败
+            return response;
+        } else {
+            //令牌验证成功
+        }
+        /*
+        这一段要用脚本来做保证原子性。String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+
+        String redisToken = redisTemplate.opsForValue().get(OrderConstant.USER_ORDER_TOKEN_PREFIX+memberResponseVO.getId());
+        if (!StringUtils.isEmpty(orderToken) && orderToken.equals(redisToken)) {
+            //令牌验证通过
+            redisTemplate.delete(OrderConstant.USER_ORDER_TOKEN_PREFIX+memberResponseVO.getId());
+        }else {
+            //不通过
+        }*/
+        return response;
 
     }
 }

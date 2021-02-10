@@ -1,9 +1,11 @@
 package com.atguigu.gulimall.order.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 @Data
+@ToString
 public class OrderSubmitVo {
     // 收获地址的id
     private Long addrId;
