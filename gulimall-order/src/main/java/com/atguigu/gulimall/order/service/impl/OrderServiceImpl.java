@@ -166,7 +166,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             BigDecimal payPrice = submitVo.getPayPrice();
             if (Math.abs(payAmount.subtract(payPrice).doubleValue()) <0.01){
                 // 金额对比成功
-                // 3、保持订单
+                // 3、TODO 保存订单
                 saveOrder(order);
                 // 4、库存锁定,只要有异常回滚订单数据。订单号，订单项信息（skuId,skuName,num）
                 WareSkuLockVo wareSkuLockVo = new WareSkuLockVo();
@@ -179,11 +179,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     return orderItemVo;
                 }).collect(Collectors.toList());
                 wareSkuLockVo.setLocks(orderItemVos);
-                // TODO 远程锁库存
+                // 4、TODO 远程锁库存
                 R r = wmsFeignService.orderLockStock(wareSkuLockVo);
                 if (r.getCode() == 0){
                     //锁成功了
                     response.setOrder(order.getOrder());
+                    // 5 TODO 远程扣减级分
                     return response;
                 }else {
                     //锁定失败
