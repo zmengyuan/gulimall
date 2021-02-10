@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.SkuHasStockVo;
-import com.atguigu.gulimall.ware.exception.NoStockException;
 import com.atguigu.gulimall.ware.vo.WareSkuLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

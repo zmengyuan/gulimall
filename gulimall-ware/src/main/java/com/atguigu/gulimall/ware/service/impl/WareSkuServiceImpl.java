@@ -1,7 +1,7 @@
 package com.atguigu.gulimall.ware.service.impl;
 
+import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.utils.R;
-import com.atguigu.gulimall.ware.exception.NoStockException;
 import com.atguigu.gulimall.ware.feign.ProductFeignService;
 import com.atguigu.common.to.SkuHasStockVo;
 import com.atguigu.gulimall.ware.vo.OrderItemVo;
@@ -130,7 +130,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             List<Long> wareIds = hasStock.getWareId();
             if (wareIds == null || wareIds.size() == 0){
                 //没有任何库存有这个商品的库存
-                throw new NoStockException(skuId);
+                throw new NoStockException("没有：skuId:"+skuId+"这个库存");
             }
             for (Long wareId : wareIds) {
                 // TODO 表wms_ware_sku表的stock_locked默认值设置为0
@@ -144,7 +144,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             }
             if (skuStocked == false){
                 //当前商品所有仓库都没有锁住
-                throw new NoStockException(skuId);
+                throw new NoStockException(skuId+"这个商品库存不足");
             }
         }
         // 3、肯定全部都是锁定成功的
