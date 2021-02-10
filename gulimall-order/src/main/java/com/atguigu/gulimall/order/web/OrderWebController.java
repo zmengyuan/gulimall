@@ -46,6 +46,7 @@ public class OrderWebController {
             return "pay";
         } else {
             // 订单失败返回到订单确认页面
+
             return "redirect:http://order.gulimall.com/toTrade";
         }
     }
