@@ -1,16 +1,20 @@
 package com.atguigu.gulimall.ware.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.enume.OrderStatusEnum;
 import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.StockDetailTo;
 import com.atguigu.common.to.StockLockedTo;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskDetailEntity;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskEntity;
+import com.atguigu.gulimall.ware.feign.OrderFeignService;
 import com.atguigu.gulimall.ware.feign.ProductFeignService;
 import com.atguigu.common.to.SkuHasStockVo;
 import com.atguigu.gulimall.ware.service.WareOrderTaskDetailService;
 import com.atguigu.gulimall.ware.service.WareOrderTaskService;
 import com.atguigu.gulimall.ware.vo.OrderItemVo;
+import com.atguigu.gulimall.ware.vo.OrderVo;
 import com.atguigu.gulimall.ware.vo.WareSkuLockVo;
 import lombok.Data;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -49,6 +53,9 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     WareOrderTaskService wareOrderTaskService;
     @Autowired
     WareOrderTaskDetailService wareOrderTaskDetailService;
+
+    @Autowired
+    OrderFeignService orderFeignService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         /**
@@ -216,5 +223,48 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         private Long skuId;
         private Integer num;
         private List<Long> wareId;
+    }
+
+    @Override
+    public void unlock(StockLockedTo stockLockedTo) {
+        StockDetailTo detailTo = stockLockedTo.getDetailTo();
+        WareOrderTaskDetailEntity detailEntity = wareOrderTaskDetailService.getById(detailTo.getId());
+        //1.如果工作单详情不为空，说明该库存锁定成功
+        if (detailEntity != null) {
+            /*看要不要解锁----------------要看订单情况：
+                1、没有这个订单，必须解锁
+                2、有这个订单，不是解锁库存
+                    订单状态：已取消：解锁库存
+                            没取消：不能解锁
+             */
+            WareOrderTaskEntity taskEntity = wareOrderTaskService.getById(stockLockedTo.getId());
+            R r = orderFeignService.getOrderStatus(taskEntity.getOrderSn());
+            if (r.getCode() == 0) {
+                OrderVo order = r.getData("order", new TypeReference<OrderVo>() {
+                });
+                //没有这个订单||订单状态已经取消 解锁库存
+                if (order == null||order.getStatus()== OrderStatusEnum.CANCLED.getCode()) {
+                    //为保证幂等性，只有当工作单详情处于被锁定的情况下才进行解锁
+                    if (detailEntity.getLockStatus()== 1){
+                        unlockStock(detailTo.getSkuId(), detailTo.getSkuNum(), detailTo.getWareId(), detailEntity.getId());
+                    }
+                }
+            }else {
+                throw new RuntimeException("远程调用订单服务失败");
+            }
+        }else {
+            //库存锁定失败，
+            //无需解锁
+        }
+    }
+
+    private void unlockStock(Long skuId, Integer skuNum, Long wareId, Long taskDetailId) {
+        //库存解锁
+        wareSkuDao.unlockStock(skuId,wareId,skuNum,taskDetailId);
+        //更新库存解锁单状态
+        WareOrderTaskDetailEntity entity = new WareOrderTaskDetailEntity();
+        entity.setId(taskDetailId);
+        entity.setLockStatus(2);//已解锁
+        wareOrderTaskDetailService.updateById(entity);
     }
 }

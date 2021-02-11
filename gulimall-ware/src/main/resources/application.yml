@@ -13,6 +13,9 @@ spring:
   rabbitmq:
     host: 192.168.56.9
     virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
 mybatis-plus:
   mapper-location: classpath:/mapper/**/*.xml
   global-config:
