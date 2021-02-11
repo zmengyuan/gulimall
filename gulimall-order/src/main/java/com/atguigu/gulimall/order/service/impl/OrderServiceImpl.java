@@ -190,6 +190,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     //锁成功了
                     response.setOrder(order.getOrder());
                     // 5 TODO 远程扣减级分
+                    int i = 10/0;
                     return response;
                 }else {
                     //锁定失败
