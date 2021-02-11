@@ -57,6 +57,7 @@ public class OrderWebController {
                 return "redirect:http://order.gulimall.com/toTrade";
             }
         } catch (Exception e) {
+            log.error("提交订单异常",e);
             if (e instanceof NoStockException) {
                 String message = e.getMessage();
                 redirectAttributes.addFlashAttribute("msg", message);
