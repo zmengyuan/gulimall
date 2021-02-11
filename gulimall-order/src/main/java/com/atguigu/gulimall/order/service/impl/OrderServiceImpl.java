@@ -182,6 +182,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 }).collect(Collectors.toList());
                 wareSkuLockVo.setLocks(orderItemVos);
                 // 4、TODO 远程锁库存
+                //库存成功了，但是网络原因超时了，订单回滚，库存不滚
+                 //为了保证高并发，库存服务自己回滚，可以发消息给库存服务。
+                //库存服务本身也可以使用自动解锁模式，使用消息队列来完成
                 R r = wmsFeignService.orderLockStock(wareSkuLockVo);
                 if (r.getCode() == 0){
                     //锁成功了
