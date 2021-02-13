@@ -1,13 +1,11 @@
 package com.atguigu.gulimall.order.config;
 
-import com.alibaba.druid.sql.visitor.functions.Bin;
+import com.atguigu.common.constant.RabbitConstant;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,17 +33,16 @@ public class MyMQConfig {
     @Bean
     public Queue orderDelayQueue() {
         Map<String,Object> arguments = new HashMap<>();
-        arguments.put("x-dead-letter-exchange", "order-event-exchange");
-        arguments.put("x-dead-letter-routing-key", "order.release.order");//死信路由
+        arguments.put("x-dead-letter-exchange", RabbitConstant.ORDER_EVENT_EXCHANGE);
+        arguments.put("x-dead-letter-routing-key", RabbitConstant.ORDER_RELEASE_ORDER);//死信路由
         arguments.put("x-message-ttl", 60000);
-        Queue queue = new Queue("order.delay.queue", true, false, false,arguments);
-
+        Queue queue = new Queue(RabbitConstant.ORDER_DELAY_QUEUE, true, false, false,arguments);
         return queue;
 
     }
     @Bean
-    public Queue orderReleaseQueue() {
-        Queue queue = new Queue("order.release.queue", true, false, false);
+    public Queue orderReleaseOrderQueue() {
+        Queue queue = new Queue(RabbitConstant.ORDER_RELEASE_ORDER_QUEUE, true, false, false);
         return queue;
     }
 
@@ -56,7 +53,7 @@ public class MyMQConfig {
      */
     @Bean
     public Exchange orderEventExchange() {
-        TopicExchange topicExchange = new TopicExchange("order-event-exchange", true, false);
+        TopicExchange topicExchange = new TopicExchange(RabbitConstant.ORDER_EVENT_EXCHANGE, true, false);
         return topicExchange;
     }
 
@@ -65,14 +62,14 @@ public class MyMQConfig {
      * @return
      */
     @Bean
-    public Binding orderCreateOrder(){
-        return new Binding("order.delay.queue", Binding.DestinationType.QUEUE,"order-event-exchange"
-            ,"order.create.order",null);
+    public Binding orderCreateOrderBinding(){
+        return new Binding(RabbitConstant.ORDER_DELAY_QUEUE, Binding.DestinationType.QUEUE,RabbitConstant.ORDER_EVENT_EXCHANGE
+            ,RabbitConstant.ORDER_CREATE_ORDER,null);
     }
     @Bean
-    public Binding orderReleaseOrder() {
-        return new Binding("order.release.queue", Binding.DestinationType.QUEUE,"order-event-exchange"
-                ,"order.release.order",null);
+    public Binding orderReleaseOrderBinding() {
+        return new Binding(RabbitConstant.ORDER_RELEASE_ORDER_QUEUE, Binding.DestinationType.QUEUE,RabbitConstant.ORDER_EVENT_EXCHANGE
+                ,RabbitConstant.ORDER_RELEASE_ORDER,null);
     }
 
 }
