@@ -17,10 +17,11 @@ public class LoginUserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //排除一个路径 库存解锁的时候查询订单的状态
         String uri = request.getRequestURI();
-        boolean match = new AntPathMatcher().match("/order/order/status/**", uri);
-        if (match){
+        AntPathMatcher matcher = new AntPathMatcher();
+        boolean status = matcher.match("/order/order/status/**", uri);
+        boolean payed = matcher.match("/payed/**", uri);
+        if (status || payed)
             return true;
-        }
 
         MemberRespVo attribute = (MemberRespVo) request.getSession().getAttribute(AuthServerConstant.LOGIN_USER);
         if (attribute != null){
