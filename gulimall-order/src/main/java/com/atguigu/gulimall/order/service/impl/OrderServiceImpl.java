@@ -377,7 +377,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             OrderTo orderTo = new OrderTo();
             BeanUtils.copyProperties(orderEntity,orderTo);
             //发给MQ一个  发送给order交换机。order交换机路由了order.release.other 到库存释放队列
-            rabbitTemplate.convertAndSend(RabbitConstant.ORDER_EVENT_EXCHANGE,"order.release.other",orderTo);
+            //TODO 如何保证消息一定会发送出去 .每个消息做好日志记录（给数据库保存每一个消息的详细 ） /报错误了。修改数据库当前消息的错误状态-》错误
+            try{
+                rabbitTemplate.convertAndSend(RabbitConstant.ORDER_EVENT_EXCHANGE,"order.release.other",orderTo);
+            }catch (Exception e){
+                //TODO 将设法成功的消息重新
+            }
+
         }
     }
 }
