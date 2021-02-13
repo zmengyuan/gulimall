@@ -84,5 +84,11 @@ spring:
           uri: lb://gulimall-member
           predicates:
             - Host=member.gulimall.com
+        - id: coupon_route #优惠
+          uri: lb://gulimall-coupon
+          predicates:
+            - Path=/api/coupon/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
 

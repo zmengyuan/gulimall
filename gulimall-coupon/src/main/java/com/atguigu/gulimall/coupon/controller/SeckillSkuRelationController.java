@@ -31,7 +31,7 @@ public class SeckillSkuRelationController {
     private SeckillSkuRelationService seckillSkuRelationService;
 
     /**
-     * 列表
+     * 列表  秒杀活动关联的商品
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
