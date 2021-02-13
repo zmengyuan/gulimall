@@ -98,6 +98,13 @@
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
             <version>2.1.0.RELEASE</version>
         </dependency>
+        <!--阿里支付模块-->
+        <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.9.28.ALL</version>
+        </dependency>
     </dependencies>
 
 
