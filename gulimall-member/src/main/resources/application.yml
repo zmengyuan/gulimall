@@ -10,6 +10,8 @@ spring:
         server-addr: 192.168.56.9:8848
   application:
     name: gulimall-member
+  thymeleaf:
+    cache: false
 mybatis-plus:
   mapper-location: classpath:/mapper/**/*.xml
   global-config:
@@ -17,7 +19,6 @@ mybatis-plus:
       id-type: auto  # id主键自增
 server:
   port: 9092
-
 logging:
   level:
     com.atguigu.gulimall: debug
