@@ -16,7 +16,7 @@ import java.util.Map;
 @Configuration
 @Slf4j
 public class MyMQConfig {
-    @RabbitListener(queues = "order.release.queue")
+    @RabbitListener(queues = RabbitConstant.ORDER_RELEASE_ORDER_QUEUE)
     public void listener(OrderEntity orderEntity, Channel channel, Message message) throws IOException {
         log.info("收到过期的订单信息，准备关闭订单,{}",orderEntity.toString());
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
