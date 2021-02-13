@@ -16,13 +16,6 @@ import java.util.Map;
 @Configuration
 @Slf4j
 public class MyMQConfig {
-    @RabbitListener(queues = RabbitConstant.ORDER_RELEASE_ORDER_QUEUE)
-    public void listener(OrderEntity orderEntity, Channel channel, Message message) throws IOException {
-        log.info("收到过期的订单信息，准备关闭订单,{}",orderEntity.toString());
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-    }
-
-
     //@Bean Binding\Queue\Exchange
 
     /**
@@ -70,6 +63,16 @@ public class MyMQConfig {
     public Binding orderReleaseOrderBinding() {
         return new Binding(RabbitConstant.ORDER_RELEASE_ORDER_QUEUE, Binding.DestinationType.QUEUE,RabbitConstant.ORDER_EVENT_EXCHANGE
                 ,RabbitConstant.ORDER_RELEASE_ORDER,null);
+    }
+
+    /**
+     * 为避免bug 再创建一个逻辑 。即订单关闭了，告诉库存解锁服务。
+     * @return
+     */
+    @Bean
+    public Binding orderReleaseOtherBinding() {
+        return new Binding(RabbitConstant.STOCK_RELEASE_STOCK_QUEUE, Binding.DestinationType.QUEUE,RabbitConstant.ORDER_EVENT_EXCHANGE
+                ,"order.release.other.#",null);
     }
 
 }

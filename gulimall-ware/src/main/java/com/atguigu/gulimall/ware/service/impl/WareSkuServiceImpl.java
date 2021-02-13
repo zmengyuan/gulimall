@@ -6,6 +6,7 @@ import com.atguigu.common.enume.OrderStatusEnum;
 import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.StockDetailTo;
 import com.atguigu.common.to.StockLockedTo;
+import com.atguigu.common.to.mq.OrderTo;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskDetailEntity;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskEntity;
@@ -247,7 +248,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 if (order == null||order.getStatus()== OrderStatusEnum.CANCLED.getCode()) {
                     //为保证幂等性，只有当工作单详情处于被锁定的情况下才进行解锁
                     if (detailEntity.getLockStatus()== 1){
-                        unlockStock(detailTo.getSkuId(), detailTo.getSkuNum(), detailTo.getWareId(), detailEntity.getId());
+                        unlockStock(detailTo.getSkuId(), detailTo.getWareId(),detailTo.getSkuNum(),  detailEntity.getId());
                     }
                 }
             }else {
@@ -259,7 +260,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         }
     }
 
-    private void unlockStock(Long skuId, Integer skuNum, Long wareId, Long taskDetailId) {
+    private void unlockStock(Long skuId, Long wareId,Integer skuNum,  Long taskDetailId) {
         //库存解锁
         wareSkuDao.unlockStock(skuId,wareId,skuNum,taskDetailId);
         //更新库存解锁单状态
@@ -268,4 +269,27 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         entity.setLockStatus(2);//已解锁
         wareOrderTaskDetailService.updateById(entity);
     }
+
+    /**
+     * 防止订单服务卡顿，导致订单状态一直改变不了，库存消息优先到期，查订单状态新建状态，什么都不做就走了
+     * 导致卡顿的订单，永远不能解锁库存
+     * @param to
+     */
+    @Transactional
+    @Override
+    public void unLockStockForOrder(OrderTo to) {
+        String orderSn = to.getOrderSn();
+        //查一下最新的库存解锁状态，防止重复解锁库存
+        R r = orderFeignService.getOrderStatus(orderSn);
+        WareOrderTaskEntity task = wareOrderTaskService.getOrderTaskByOrderSn(orderSn);
+        Long id = task.getId();
+        //按照工作单找到所有 没有解锁的库存，进行解锁
+        List<WareOrderTaskDetailEntity> entities = wareOrderTaskDetailService.list(new QueryWrapper<WareOrderTaskDetailEntity>().eq("task_id", id).eq("lock_status", 1));
+        for (WareOrderTaskDetailEntity entity : entities) {
+            unlockStock(entity.getSkuId(),entity.getWareId(),entity.getSkuNum(),entity.getId());
+
+        }
+    }
+
+
 }

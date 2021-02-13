@@ -2,6 +2,7 @@ package com.atguigu.gulimall.ware.listener;
 
 import com.atguigu.common.constant.RabbitConstant;
 import com.atguigu.common.to.StockLockedTo;
+import com.atguigu.common.to.mq.OrderTo;
 import com.atguigu.gulimall.ware.service.WareSkuService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,17 @@ public class StockReleaseListener {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             channel.basicReject(message.getMessageProperties().getDeliveryTag(),true);//消息拒绝之后重新放到队列里面
+        }
+    }
+    //这个是订单关闭发过来的
+    @RabbitHandler
+    public void handleOrderCloseRelease(OrderTo to, Message message, Channel channel) throws IOException {
+        log.info("************************订单关闭准备解锁库存********************************");
+        try {
+            wareSkuService.unLockStockForOrder(to);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            channel.basicReject(message.getMessageProperties().getDeliveryTag(),true);
         }
     }
 }
