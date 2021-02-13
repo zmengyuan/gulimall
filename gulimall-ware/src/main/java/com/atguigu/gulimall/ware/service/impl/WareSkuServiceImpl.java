@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.ware.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.constant.RabbitConstant;
 import com.atguigu.common.enume.OrderStatusEnum;
 import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.StockDetailTo;
@@ -201,7 +202,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                     BeanUtils.copyProperties(detailEntity,detailTo);
                     //只发id不可以，防止回滚以后找不到数据
                     lockedTo.setDetailTo(detailTo);
-                    rabbitTemplate.convertAndSend("stock-event-exchange","stock.locked",lockedTo);
+                    rabbitTemplate.convertAndSend(RabbitConstant.STOCK_EVENT_EXCHANGE,RabbitConstant.STOCK_LOCKED,lockedTo);
                     skuStocked = true;
                     break;
 

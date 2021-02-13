@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.ware.listener;
 
+import com.atguigu.common.constant.RabbitConstant;
 import com.atguigu.common.to.StockLockedTo;
 import com.atguigu.gulimall.ware.service.WareSkuService;
 import com.rabbitmq.client.Channel;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 @Slf4j
 @Component
-@RabbitListener(queues = {"stock.release.stock.queue"})
+@RabbitListener(queues = {RabbitConstant.STOCK_RELEASE_STOCK_QUEUE})
 public class StockReleaseListener {
 
     @Autowired
