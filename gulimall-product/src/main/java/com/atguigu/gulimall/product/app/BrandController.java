@@ -80,10 +80,9 @@ public class BrandController {
 //        }else {
 //
 //        }
-
-        brand.setLogo("logo写死");
+        //TODO 品牌logo 没有传值 图片地址
+        brand.setLogo("https://www.baidu.com/img/dong_8f1d47bcb77d74a1e029d8cbb3b33854.gif");
 		brandService.save(brand);
-
         return R.ok();
     }
 
