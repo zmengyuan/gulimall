@@ -4,14 +4,13 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.seckill.service.SeckillService;
 import com.atguigu.gulimall.seckill.to.SeckillSkuRedisTo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 public class SeckillController {
     @Autowired
     SeckillService seckillService;
@@ -20,6 +19,7 @@ public class SeckillController {
      * @return
      */
     @GetMapping(value = "/getCurrentSeckillSkus")
+    @ResponseBody
     public R getCurrentSeckillSkus() {
         //获取到当前可以参加秒杀商品的信息
         List<SeckillSkuRedisTo> vos = seckillService.getCurrentSeckillSkus();
@@ -31,19 +31,26 @@ public class SeckillController {
     获取skuId的秒杀信息
      */
     @GetMapping("/sku/seckill/{skuId}")
+    @ResponseBody
     public R getSkuSecKillInfo(@PathVariable("skuId") Long skuId){
         SeckillSkuRedisTo to = seckillService.getSkuSecKillInfo(skuId);
         return R.ok().setData(to);
     }
 
+    /*
+    TODO 上架秒杀商品的时候，每一个数据都有过期时间
+    秒杀后续的流程，简化了收获地址等信息
+    秒杀结束之后，应该给之前扣减库存的加上还剩下的。
+     */
     @GetMapping("/kill")
-    public R seckill(@RequestParam("killId") String killId,
+    public String seckill(@RequestParam("killId") String killId,
                      @RequestParam("key") String key,
-                     @RequestParam("num") Integer num){
+                     @RequestParam("num") Integer num, Model model){
         // 1、判断是否登录(登录拦截器已经自动处理)
 
         String orderSn = seckillService.kill(killId, key, num);
-        return R.ok().setData(orderSn);
+        model.addAttribute("orderSn", orderSn);
+        return "success";
     }
 
 }
