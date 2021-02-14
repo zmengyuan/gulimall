@@ -75,4 +75,18 @@ public class MyMQConfig {
                 ,"order.release.other.#",null);
     }
 
+    @Bean
+    public Queue orderSeckillOrderQueue(){
+        return new Queue(RabbitConstant.ORDER_SECKILL_ORDER_QUEUE, true, false, false);
+    }
+
+    @Bean
+    public Binding orderSeckillOrderQueueBinding(){
+        return new Binding(RabbitConstant.ORDER_SECKILL_ORDER_QUEUE,
+                Binding.DestinationType.QUEUE,
+                RabbitConstant.ORDER_EVENT_EXCHANGE,
+                RabbitConstant.ORDER_SECKILL_ORDER,
+                null);
+    }
+
 }

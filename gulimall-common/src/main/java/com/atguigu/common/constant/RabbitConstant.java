@@ -23,4 +23,8 @@ public class RabbitConstant {
     //库存锁定路由
     public static final String STOCK_LOCKED="stock.locked";
 
+    //秒杀成功放入mq
+    public static final String ORDER_SECKILL_ORDER = "order.seckill.order";
+    public static final String ORDER_SECKILL_ORDER_QUEUE = "order.seckill.order.queue";
+
 }
