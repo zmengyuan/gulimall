@@ -178,4 +178,8 @@ public class SeckillServiceImpl implements SeckillService {
         return null;
     }
 
+    @Override
+    public String kill(String killId, String key, Integer num) {
+        return null;
+    }
 }
