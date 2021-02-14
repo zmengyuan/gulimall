@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -117,5 +118,32 @@ public class SeckillServiceImpl implements SeckillService {
                 }
             });
         });
+    }
+
+
+    @Override
+    public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
+        Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+        long currentTime = System.currentTimeMillis();
+        for (String key : keys) {
+            String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+            String[] split = replace.split("_");
+            long startTime = Long.parseLong(split[0]);
+            long endTime = Long.parseLong(split[1]);
+            // 当前秒杀活动处于有效期内
+            if (currentTime > startTime && currentTime < endTime) {
+                // 获取这个秒杀场次的所有商品信息
+                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                assert range != null;
+                List<String> strings = hashOps.multiGet(range);
+                if (!CollectionUtils.isEmpty(strings)) {
+                    return strings.stream().map(item -> JSON.parseObject(item, SeckillSkuRedisTo.class))
+                            .collect(Collectors.toList());
+                }
+                break;
+            }
+        }
+        return null;
     }
 }

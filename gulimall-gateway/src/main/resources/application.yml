@@ -90,5 +90,9 @@ spring:
             - Path=/api/coupon/**
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
+        - id: gulimall_seckill_route #秒杀商品
+          uri: lb://gulimall-seckill
+          predicates:
+            - Host=seckill.gulimall.com
 
 
