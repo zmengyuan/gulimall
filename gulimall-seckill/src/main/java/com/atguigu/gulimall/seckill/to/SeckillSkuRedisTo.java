@@ -39,4 +39,9 @@ public class SeckillSkuRedisTo {
 
     //sku详细信息
     private SkuInfoVo skuInfoVo;
+    //秒杀开始时间
+    private Long startTime;
+    private Long endTime;
+
+    private String randomCode;
 }

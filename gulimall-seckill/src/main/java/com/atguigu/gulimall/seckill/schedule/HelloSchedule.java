@@ -27,8 +27,8 @@ public class HelloSchedule {
      *
      *      解决：使用异步任务来完成定时任务不阻塞的功能
      */
-    @Async
-    @Scheduled(cron = "*/5 * * * * ?")
+//    @Async
+//    @Scheduled(cron = "*/5 * * * * ?")
     public void hello() throws InterruptedException {
         log.info("hello......");
         Thread.sleep(3000);

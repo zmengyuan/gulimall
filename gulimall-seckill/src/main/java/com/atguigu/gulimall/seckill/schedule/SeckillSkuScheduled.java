@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class SeckillSkuScheduled {
     @Autowired
     SeckillService seckillService;
-    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void uploadSeckillSkuLatest3Days() {
 
         //重复上架无需处理
