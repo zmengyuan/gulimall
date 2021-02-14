@@ -18,9 +18,11 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -146,4 +148,34 @@ public class SeckillServiceImpl implements SeckillService {
         }
         return null;
     }
+
+    @Override
+    public SeckillSkuRedisTo getSkuSecKillInfo(Long skuId) {
+        // 1、找到所有需要参与秒杀的商品的key
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        Set<String> keys = hashOps.keys();
+        if (null != keys && keys.size()>0){
+            //6_4
+            String regx = "\\d_" + skuId;
+            for (String key : keys) {
+                if (Pattern.matches(regx, key)){//匹配正则 包含商品
+                    String json = hashOps.get(key);
+                    //获取到redis存储的信息
+                    SeckillSkuRedisTo skuRedisTo = JSON.parseObject(json, SeckillSkuRedisTo.class);
+
+                    //如果是合适的展示时间才展示  随机码
+                    long current = new Date().getTime();
+                    if (current >= skuRedisTo.getStartTime() && current <= skuRedisTo.getEndTime()){
+
+                    }else {
+                        skuRedisTo.setRandomCode(null);
+                    }
+                    return skuRedisTo;
+                }
+
+            }
+        }
+        return null;
+    }
+
 }

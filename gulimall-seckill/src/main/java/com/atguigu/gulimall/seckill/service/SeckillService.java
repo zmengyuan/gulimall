@@ -8,4 +8,6 @@ public interface SeckillService {
     void uploadSeckillSkuLatest3Days();
 
     List<SeckillSkuRedisTo> getCurrentSeckillSkus();
+
+    SeckillSkuRedisTo getSkuSecKillInfo(Long skuId);
 }
