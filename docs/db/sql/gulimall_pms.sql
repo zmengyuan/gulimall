@@ -60,7 +60,7 @@ create table pms_attr_attrgroup_relation
    primary key (id)
 );
 
-alter table pms_attr_attrgroup_relation comment '属性&属性分组关联';
+alter table pms_attr_attrgroup_relation comment '属性&属性分组关联，此项目中只有规格属性有分组且一个属性只能有一个分组';
 
 /*==============================================================*/
 /* Table: pms_attr_group                                        */
