@@ -17,6 +17,7 @@ import com.atguigu.gulimall.ware.service.WareOrderTaskDetailService;
 import com.atguigu.gulimall.ware.service.WareOrderTaskService;
 import com.atguigu.gulimall.ware.vo.OrderItemVo;
 import com.atguigu.gulimall.ware.vo.OrderVo;
+import com.atguigu.gulimall.ware.vo.SkuInfoVo;
 import com.atguigu.gulimall.ware.vo.WareSkuLockVo;
 import lombok.Data;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -99,10 +100,9 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             //TODO 还可以用什么办法让异常出现以后不回滚？高级
             try {
                 R info = productFeignService.info(skuId);
-                Map<String,Object> data = (Map<String, Object>) info.get("skuInfo");
-
                 if(info.getCode() == 0){
-                    skuEntity.setSkuName((String) data.get("skuName"));
+                    SkuInfoVo data = info.getData("skuInfo",new TypeReference<SkuInfoVo>(){});
+                    skuEntity.setSkuName(data.getSkuName());
                 }
             }catch (Exception e){
 
