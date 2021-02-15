@@ -69,8 +69,10 @@ public class PurchaseDetailController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody PurchaseDetailEntity purchaseDetail){
-		purchaseDetailService.updateById(purchaseDetail);
-
+        PurchaseDetailEntity qu = purchaseDetailService.getById(purchaseDetail.getId());
+        if (qu != null && qu.getStatus() == 0) {
+            purchaseDetailService.updateById(purchaseDetail);
+        }
         return R.ok();
     }
 
