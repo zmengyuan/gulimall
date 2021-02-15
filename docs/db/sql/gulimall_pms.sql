@@ -46,6 +46,7 @@ create table pms_attr
 );
 
 alter table pms_attr comment '商品属性';
+alter table pms_attr add COLUMN `value_type` TINYINT(4)  DEFAULT NULL COMMENT '值类型[0-为单个值，1-可以选择多个值]';
 
 /*==============================================================*/
 /* Table: pms_attr_attrgroup_relation                           */
