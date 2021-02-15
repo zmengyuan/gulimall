@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.atguigu.common.constant.ProductConstant;
 import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
 import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
@@ -88,6 +89,9 @@ public class AttrController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody AttrVo attr){
+        if (attr.getAttrType() ==  ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()==null){
+            throw new RuntimeException("规格参数必须确定属性分组");
+        }
 		attrService.saveAttr(attr);
 
         return R.ok();
@@ -98,6 +102,9 @@ public class AttrController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody AttrVo attr){
+        if (attr.getAttrType() ==  ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()==null){
+            throw new RuntimeException("规格参数必须确定属性分组");
+        }
         attrService.updateAttr(attr);
 
         return R.ok();
