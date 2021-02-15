@@ -13,14 +13,15 @@ public class SpuSaveVo {
     private Long brandId;
     //重量
     private BigDecimal weight;
-    //商品发布状态
-    private int publishStatus;
-    //商品描述图片
+    //设置积分：  金币和成长值
+    private Bounds bounds;
+    //商品介绍图片
     private List<String> decript;
     //商品图集
     private List<String> images;
-    //设置积分：  金币和成长值
-    private Bounds bounds;
+
+    //商品发布状态
+    private int publishStatus;
     //规格参数
     private List<BaseAttrs> baseAttrs;
     //销售属性
