@@ -267,10 +267,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return attr.getAttrId();
         }).collect(Collectors.toList());
 
-        List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
+        List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);//可被检索的属性
         Set<Long> idSet = new HashSet<>(searchAttrIds);
 
-
+        //构造ES 中可被检索的属性 数据结构
         List<SkuEsModel.Attr> attrList = baseAttrs.stream().filter((attrValue) -> {
             return idSet.contains(attrValue.getAttrId());
         }).map(item -> {
@@ -288,7 +288,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<Long> skuIdList = skus.stream().map(sku -> {
             return sku.getSkuId();
         }).collect(Collectors.toList());
-//        TODO 发送远程调用 是否有库存
+//      发送远程调用 是否有库存
         Map<Long, Boolean> stockMap = null;
         try{
             R r = wareFeignService.getSkusHasStock(skuIdList);
@@ -325,16 +325,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuEsModel.setBrandImg(brand.getLogo());
             CategoryEntity category = categoryService.getById(skuEsModel.getCatalogId());
             skuEsModel.setCatalogName(category.getName());
-            //attr TODO 查询所有能被检索的规格属性，应该放在外面查询一次就可以了
+            //attr  查询所有能被检索的规格属性，应该放在外面查询一次就可以了
             skuEsModel.setAttrs(attrList);
             return skuEsModel;
         }).collect(Collectors.toList());
 
-        //TODO 调用检索服务保存es
+        // 调用检索服务保存es
         R r = searchFeignService.productStatusUp(upProducts);
         if (r.getCode() == 0){
 //            远程调用成功
-//          TODO 6 修改spu 状态
+//          6 修改spu 状态
             baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode()) ;
         }else {
 //            远程调用失败
