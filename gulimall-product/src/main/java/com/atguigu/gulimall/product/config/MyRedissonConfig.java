@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 
 @Configuration
-public class MyRedisConfig {
+public class MyRedissonConfig {
     @Bean(destroyMethod="shutdown")
     public RedissonClient redisson() throws IOException {
         //单节点模式
@@ -18,5 +18,14 @@ public class MyRedisConfig {
         RedissonClient redisson = Redisson.create(config);
         return redisson;
     }
+
+    /*
+    集群模式
+     */
+//    public RedissonClient redisson() {
+//        Config config = new Config();
+//        config.useClusterServers().addNodeAddress("","");
+//        return Redisson.create(config);
+//    }
 }
 
