@@ -16,9 +16,8 @@ PUT gulimall_product
                 "type": "keyword"
             },
             "skuImg":{
-                "type": "keyword",
-                "index": false,
-                "doc_values": true
+                "type": "keyword"
+
             },
             "saleCount":{
                 "type":"long"
@@ -36,19 +35,13 @@ PUT gulimall_product
                 "type": "long"
             },
             "brandName": {
-                "type": "keyword",
-                "index": false,
-                "doc_values": true
+                "type": "keyword"
             },
             "brandImg":{
-                "type": "keyword",
-                 "index": false,
-                "doc_values": true
+                "type": "keyword"
             },
             "catalogName": {
-                "type": "keyword",
-                "index": false,
-                "doc_values": true
+                "type": "keyword"
             },
             "attrs": {
                 "type": "nested",
@@ -57,9 +50,7 @@ PUT gulimall_product
                         "type": "long"
                     },
                     "attrName": {
-                        "type": "keyword",
-                        "index": false,
-                        "doc_values": true
+                        "type": "keyword"
                     },
                     "attrValue": {
                         "type": "keyword"
